@@ -7,10 +7,10 @@ import {
   FlatList,
   StyleSheet,
   StatusBar,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 // Type is preserved to keep data structure clear
@@ -151,39 +151,12 @@ export default function TodoScreen() {
                   <View key={item.id}>{renderTask({ item })}</View>
                 ))}
               </View>
-
               <View style={{ height: 100 }} />
             </>
           }
           showsVerticalScrollIndicator={false}
           style={styles.flex}
         />
-
-        {/* Bottom Navigation - Only 3 Menus (Focus Removed) */}
-        <View style={styles.bottomNav}>
-          <TouchableOpacity style={styles.navItem} activeOpacity={0.7}>
-            <MaterialCommunityIcons
-              name="check-all"
-              size={24}
-              color="#26C6DA"
-            />
-            <Text style={styles.navLabelActive}>Tasks</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem} activeOpacity={0.7}>
-            <MaterialCommunityIcons
-              name="calendar-month"
-              size={24}
-              color="#ccc"
-            />
-            <Text style={styles.navLabel}>Calendar</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem} activeOpacity={0.7}>
-            <MaterialCommunityIcons name="cog" size={24} color="#ccc" />
-            <Text style={styles.navLabel}>Settings</Text>
-          </TouchableOpacity>
-        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -386,48 +359,5 @@ const styles = StyleSheet.create({
   deleteIcon: {
     fontSize: 16,
     color: "#ccc",
-  },
-
-  // Bottom Nav
-  bottomNav: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
-    backgroundColor: "#fff",
-  },
-  navItem: {
-    flex: 1,
-    alignItems: "center",
-    gap: 4,
-  },
-  navLabel: {
-    fontSize: 11,
-    color: "#aaa",
-    fontWeight: "500",
-  },
-  navLabelActive: {
-    fontSize: 11,
-    color: "#26C6DA",
-    fontWeight: "700",
-  },
-  navBadge: {
-    position: "absolute",
-    top: -4,
-    right: -8,
-    backgroundColor: "#FF5252",
-    borderRadius: 8,
-    width: 16,
-    height: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  navBadgeText: {
-    color: "#fff",
-    fontSize: 9,
-    fontWeight: "bold",
   },
 });
