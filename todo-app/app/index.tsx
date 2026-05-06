@@ -7,25 +7,50 @@ import {
   FlatList,
   StyleSheet,
   StatusBar,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  Modal,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Type tetap dipertahankan agar struktur data jelas
 type Task = {
   id: string;
   title: string;
   completed: boolean;
+  dueDate?: string; // Format: "YYYY-MM-DD"
 };
 
 export default function TodoScreen() {
   // Data dikosongkan (Tugas Affan untuk menghubungkan ke database/state)
   const [tasks, setTasks] = useState<Task[]>([]);
   const [inputText, setInputText] = useState("");
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [isDateEnabled, setIsDateEnabled] = useState(false);
 
   const activeTasks = tasks.filter((t) => !t.completed);
   const completedTasks = tasks.filter((t) => t.completed);
+
+  // Format date to string (YYYY-MM-DD)
+  const formatDateString = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  // Format date for display
+  const formatDateDisplay = (dateString?: string): string => {
+    if (!dateString) return "No due date";
+    const [year, month, day] = dateString.split("-");
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    return date.toLocaleDateString("default", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+  };
 
   // Add Task Logic
   const addTask = () => {
@@ -37,18 +62,21 @@ export default function TodoScreen() {
       id: Date.now().toString(),
       title: inputText.trim(),
       completed: false,
+      dueDate: isDateEnabled ? formatDateString(selectedDate) : undefined,
     };
 
     setTasks([...tasks, newTask]);
     setInputText("");
+    setSelectedDate(new Date()); // Reset to today
+    setIsDateEnabled(false); // Reset date enabled toggle
   };
 
   const toggleTask = (id: string) => {
-    // Do it in feature/toggle-task branch
-  };
-
-  const deleteTask = (id: string) => {
-    // Do it in feature/delete-task branch
+    setTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task,
+      ),
+    );
   };
 
   const renderTask = ({ item }: { item: Task }) => (
@@ -60,19 +88,18 @@ export default function TodoScreen() {
       >
         {item.completed && <Text style={styles.checkmark}>✓</Text>}
       </TouchableOpacity>
-      <Text
-        style={[styles.taskTitle, item.completed && styles.taskTitleCompleted]}
-        numberOfLines={2}
-      >
-        {item.title}
-      </Text>
-      <TouchableOpacity
-        style={styles.deleteBtn}
-        onPress={() => deleteTask(item.id)}
-        activeOpacity={0.7}
-      >
-        <Text style={styles.deleteIcon}>🗑</Text>
-      </TouchableOpacity>
+      <View style={styles.taskContent}>
+        <Text
+          style={[
+            styles.taskTitle,
+            item.completed && styles.taskTitleCompleted,
+          ]}
+          numberOfLines={2}
+        >
+          {item.title}
+        </Text>
+        <Text style={styles.taskDate}>{formatDateDisplay(item.dueDate)}</Text>
+      </View>
     </View>
   );
 
@@ -128,6 +155,73 @@ export default function TodoScreen() {
                     <Text style={styles.addBtnText}>Add</Text>
                   </TouchableOpacity>
                 </View>
+
+                {/* Date Toggle Button */}
+                <TouchableOpacity
+                  style={[
+                    styles.dateToggleBtn,
+                    isDateEnabled && styles.dateToggleBtnActive,
+                  ]}
+                  onPress={() => setIsDateEnabled(!isDateEnabled)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.dateToggleIcon}>📅</Text>
+                  <Text
+                    style={[
+                      styles.dateToggleText,
+                      isDateEnabled && styles.dateToggleTextActive,
+                    ]}
+                  >
+                    {isDateEnabled ? "Remove Date" : "Add Date"}
+                  </Text>
+                </TouchableOpacity>
+
+                {/* Date Picker - Only show if enabled */}
+                {isDateEnabled && (
+                  <View style={styles.datePickerSection}>
+                    <TouchableOpacity
+                      style={styles.datePickerBtn}
+                      onPress={() =>
+                        setSelectedDate(
+                          new Date(
+                            selectedDate.getFullYear(),
+                            selectedDate.getMonth(),
+                            selectedDate.getDate() - 1,
+                          ),
+                        )
+                      }
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.datePickerArrow}>◀</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={styles.dateDisplay}
+                      onPress={() => setShowDatePicker(!showDatePicker)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.dateDisplayText}>
+                        📅 {formatDateDisplay(formatDateString(selectedDate))}
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={styles.datePickerBtn}
+                      onPress={() =>
+                        setSelectedDate(
+                          new Date(
+                            selectedDate.getFullYear(),
+                            selectedDate.getMonth(),
+                            selectedDate.getDate() + 1,
+                          ),
+                        )
+                      }
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.datePickerArrow}>▶</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
 
               {/* Active Tasks Section */}
@@ -301,6 +395,72 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 
+  // Date Toggle Button
+  dateToggleBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fff",
+    borderWidth: 2,
+    borderColor: "#e0e0e0",
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginTop: 12,
+    gap: 8,
+  },
+  dateToggleBtnActive: {
+    backgroundColor: "#e0f7fa",
+    borderColor: "#26C6DA",
+  },
+  dateToggleIcon: {
+    fontSize: 18,
+  },
+  dateToggleText: {
+    color: "#666",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  dateToggleTextActive: {
+    color: "#26C6DA",
+  },
+
+  // Date Picker Section
+  datePickerSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 12,
+    gap: 8,
+  },
+  datePickerBtn: {
+    backgroundColor: "#f7f7f7",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  datePickerArrow: {
+    fontSize: 18,
+    color: "#26C6DA",
+    fontWeight: "600",
+  },
+  dateDisplay: {
+    flex: 1,
+    backgroundColor: "#f7f7f7",
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  dateDisplayText: {
+    fontSize: 14,
+    color: "#333",
+    fontWeight: "600",
+  },
+
   // List Section
   listSection: {
     paddingHorizontal: 20,
@@ -377,17 +537,17 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontWeight: "500",
   },
+  taskContent: {
+    flex: 1,
+  },
+  taskDate: {
+    fontSize: 12,
+    color: "#999",
+    marginTop: 4,
+  },
   taskTitleCompleted: {
     textDecorationLine: "line-through",
     color: "#bbb",
-  },
-  deleteBtn: {
-    padding: 4,
-    flexShrink: 0,
-  },
-  deleteIcon: {
-    fontSize: 16,
-    color: "#ccc",
   },
 
   // Bottom Nav
