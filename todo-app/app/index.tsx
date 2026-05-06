@@ -12,6 +12,7 @@ import {
   Platform,
 } from 'react-native';
 
+// Type tetap dipertahankan agar struktur data jelas
 type Task = {
   id: string;
   title: string;
@@ -19,38 +20,24 @@ type Task = {
 };
 
 export default function TodoScreen() {
-  const [tasks, setTasks] = useState<Task[]>([
-    { id: '1', title: 'Design new mobile onboarding flow', completed: false },
-    { id: '2', title: 'Prepare presentation for stakeholder meeting', completed: false },
-    { id: '3', title: 'Update UI components library documentation', completed: false },
-    { id: '4', title: 'Review quarterly budget proposal', completed: true },
-    { id: '5', title: 'Schedule team sync for next sprint', completed: true },
-  ]);
+  // Data dikosongkan (Tugas Affan untuk menghubungkan ke database/state)
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [inputText, setInputText] = useState('');
 
   const activeTasks = tasks.filter((t) => !t.completed);
   const completedTasks = tasks.filter((t) => t.completed);
 
+  // Fungsi Logika dikosongkan (Hanya kerangka)
   const addTask = () => {
-    const trimmed = inputText.trim();
-    if (!trimmed) return;
-    const newTask: Task = {
-      id: Date.now().toString(),
-      title: trimmed,
-      completed: false,
-    };
-    setTasks((prev) => [newTask, ...prev]);
-    setInputText('');
+    // Nanti diisi oleh Affan di branch feature/add-task
   };
 
   const toggleTask = (id: string) => {
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
-    );
+    // Nanti diisi di branch feature/edit-task atau sejenisnya
   };
 
   const deleteTask = (id: string) => {
-    setTasks((prev) => prev.filter((t) => t.id !== id));
+    // Nanti diisi di branch feature/delete-task
   };
 
   const renderTask = ({ item }: { item: Task }) => (
@@ -60,9 +47,7 @@ export default function TodoScreen() {
         onPress={() => toggleTask(item.id)}
         activeOpacity={0.7}
       >
-        {item.completed && (
-          <Text style={styles.checkmark}>✓</Text>
-        )}
+        {item.completed && <Text style={styles.checkmark}>✓</Text>}
       </TouchableOpacity>
       <Text
         style={[styles.taskTitle, item.completed && styles.taskTitleCompleted]}
@@ -99,7 +84,7 @@ export default function TodoScreen() {
           <View style={styles.headerRight}>
             <View style={styles.taskBadge}>
               <Text style={styles.taskBadgeText}>
-                {activeTasks.length} Task{activeTasks.length !== 1 ? 's' : ''}
+                {activeTasks.length} Tasks
               </Text>
             </View>
             <Text style={styles.moreIcon}>•••</Text>
@@ -109,7 +94,7 @@ export default function TodoScreen() {
         <FlatList
           data={[]}
           renderItem={null}
-          keyExtractor={() => ''}
+          keyExtractor={() => 'dummy'}
           ListHeaderComponent={
             <>
               {/* Create Task Section */}
@@ -123,8 +108,6 @@ export default function TodoScreen() {
                     placeholderTextColor="#aaa"
                     value={inputText}
                     onChangeText={setInputText}
-                    onSubmitEditing={addTask}
-                    returnKeyType="done"
                   />
                   <TouchableOpacity
                     style={styles.addBtn}
@@ -136,21 +119,21 @@ export default function TodoScreen() {
                 </View>
               </View>
 
-              {/* Active Tasks */}
+              {/* Active Tasks Section */}
               <View style={styles.listSection}>
                 <View style={styles.listHeader}>
                   <Text style={styles.listLabel}>ACTIVE TASKS</Text>
                   <Text style={styles.gridIcon}>⊞</Text>
                 </View>
                 {activeTasks.length === 0 && (
-                  <Text style={styles.emptyText}>No active tasks 🎉</Text>
+                  <Text style={styles.emptyText}>No active tasks yet</Text>
                 )}
                 {activeTasks.map((item) => (
                   <View key={item.id}>{renderTask({ item })}</View>
                 ))}
               </View>
 
-              {/* Completed Tasks */}
+              {/* Completed Tasks Section */}
               <View style={styles.listSection}>
                 <View style={styles.listHeader}>
                   <Text style={styles.listLabel}>COMPLETED</Text>
@@ -173,28 +156,20 @@ export default function TodoScreen() {
           }
           showsVerticalScrollIndicator={false}
           style={styles.flex}
-          keyboardShouldPersistTaps="handled"
         />
 
-        {/* Bottom Navigation */}
+        {/* Bottom Navigation - Hanya 3 Menu (Focus Dihapus) */}
         <View style={styles.bottomNav}>
           <TouchableOpacity style={styles.navItem} activeOpacity={0.7}>
             <Text style={styles.navIconActive}>☑</Text>
             <Text style={styles.navLabelActive}>Tasks</Text>
           </TouchableOpacity>
+          
           <TouchableOpacity style={styles.navItem} activeOpacity={0.7}>
             <Text style={styles.navIcon}>📅</Text>
             <Text style={styles.navLabel}>Calendar</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem} activeOpacity={0.7}>
-            <View>
-              <Text style={styles.navIcon}>⊞</Text>
-              <View style={styles.navBadge}>
-                <Text style={styles.navBadgeText}>9</Text>
-              </View>
-            </View>
-            <Text style={styles.navLabel}>Focus</Text>
-          </TouchableOpacity>
+          
           <TouchableOpacity style={styles.navItem} activeOpacity={0.7}>
             <Text style={styles.navIcon}>⚙</Text>
             <Text style={styles.navLabel}>Settings</Text>
