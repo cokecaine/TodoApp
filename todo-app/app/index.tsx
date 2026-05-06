@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -10,9 +10,10 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-} from 'react-native';
+} from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-// Type tetap dipertahankan agar struktur data jelas
+// Type is preserved to keep data structure clear
 type Task = {
   id: string;
   title: string;
@@ -20,20 +21,20 @@ type Task = {
 };
 
 export default function TodoScreen() {
-  // Data dikosongkan (Tugas Affan untuk menghubungkan ke database/state)
+  // Data initialized (Task for Affan to connect to database/state)
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = useState("");
 
   const activeTasks = tasks.filter((t) => !t.completed);
   const completedTasks = tasks.filter((t) => t.completed);
 
-  // Fungsi Logika dikosongkan (Hanya kerangka)
+  // Logic functions left empty (Just framework)
   const addTask = () => {
-    // Nanti diisi oleh Affan di branch feature/add-task
+    // Will be filled by Affan in feature/add-task branch
   };
 
   const toggleTask = (id: string) => {
-    // Nanti diisi di branch feature/edit-task atau sejenisnya
+    // Will be filled in feature/edit-task branch or similar
   };
 
   const deleteTask = (id: string) => {
@@ -70,8 +71,8 @@ export default function TodoScreen() {
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
         {/* Header */}
         <View style={styles.header}>
@@ -94,7 +95,7 @@ export default function TodoScreen() {
         <FlatList
           data={[]}
           renderItem={null}
-          keyExtractor={() => 'dummy'}
+          keyExtractor={() => "dummy"}
           ListHeaderComponent={
             <>
               {/* Create Task Section */}
@@ -158,20 +159,28 @@ export default function TodoScreen() {
           style={styles.flex}
         />
 
-        {/* Bottom Navigation - Hanya 3 Menu (Focus Dihapus) */}
+        {/* Bottom Navigation - Only 3 Menus (Focus Removed) */}
         <View style={styles.bottomNav}>
           <TouchableOpacity style={styles.navItem} activeOpacity={0.7}>
-            <Text style={styles.navIconActive}>☑</Text>
+            <MaterialCommunityIcons
+              name="check-all"
+              size={24}
+              color="#26C6DA"
+            />
             <Text style={styles.navLabelActive}>Tasks</Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity style={styles.navItem} activeOpacity={0.7}>
-            <Text style={styles.navIcon}>📅</Text>
+            <MaterialCommunityIcons
+              name="calendar-month"
+              size={24}
+              color="#ccc"
+            />
             <Text style={styles.navLabel}>Calendar</Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity style={styles.navItem} activeOpacity={0.7}>
-            <Text style={styles.navIcon}>⚙</Text>
+            <MaterialCommunityIcons name="cog" size={24} color="#ccc" />
             <Text style={styles.navLabel}>Settings</Text>
           </TouchableOpacity>
         </View>
@@ -183,7 +192,7 @@ export default function TodoScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   flex: {
     flex: 1,
@@ -191,58 +200,58 @@ const styles = StyleSheet.create({
 
   // Header
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-    backgroundColor: '#fff',
+    borderBottomColor: "#f0f0f0",
+    backgroundColor: "#fff",
   },
   headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   logoIcon: {
     width: 32,
     height: 32,
     borderRadius: 8,
-    backgroundColor: '#26C6DA',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#26C6DA",
+    alignItems: "center",
+    justifyContent: "center",
   },
   logoCheck: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: '700',
-    color: '#26C6DA',
+    fontWeight: "700",
+    color: "#26C6DA",
     letterSpacing: 0.5,
   },
   headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
   },
   taskBadge: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
     borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
   taskBadgeText: {
     fontSize: 12,
-    color: '#555',
-    fontWeight: '500',
+    color: "#555",
+    fontWeight: "500",
   },
   moreIcon: {
     fontSize: 16,
-    color: '#aaa',
+    color: "#aaa",
     letterSpacing: 2,
   },
 
@@ -254,14 +263,14 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 22,
-    fontWeight: '800',
-    color: '#1a1a1a',
+    fontWeight: "800",
+    color: "#1a1a1a",
     marginBottom: 16,
   },
   inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f7f7f7',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f7f7f7",
     borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: 4,
@@ -269,24 +278,24 @@ const styles = StyleSheet.create({
   },
   plusIcon: {
     fontSize: 18,
-    color: '#26C6DA',
-    fontWeight: '300',
+    color: "#26C6DA",
+    fontWeight: "300",
   },
   input: {
     flex: 1,
     fontSize: 15,
-    color: '#333',
+    color: "#333",
     paddingVertical: 12,
   },
   addBtn: {
-    backgroundColor: '#26C6DA',
+    backgroundColor: "#26C6DA",
     borderRadius: 10,
     paddingHorizontal: 18,
     paddingVertical: 10,
   },
   addBtnText: {
-    color: '#fff',
-    fontWeight: '700',
+    color: "#fff",
+    fontWeight: "700",
     fontSize: 14,
   },
 
@@ -296,44 +305,44 @@ const styles = StyleSheet.create({
     paddingTop: 24,
   },
   listHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 12,
   },
   listLabel: {
     fontSize: 12,
-    fontWeight: '700',
-    color: '#aaa',
+    fontWeight: "700",
+    color: "#aaa",
     letterSpacing: 1.2,
   },
   gridIcon: {
     fontSize: 18,
-    color: '#ccc',
+    color: "#ccc",
   },
   completedBadge: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
     borderRadius: 10,
     paddingHorizontal: 8,
     paddingVertical: 2,
   },
   completedBadgeText: {
     fontSize: 12,
-    color: '#888',
-    fontWeight: '600',
+    color: "#888",
+    fontWeight: "600",
   },
   emptyText: {
     fontSize: 14,
-    color: '#ccc',
-    textAlign: 'center',
+    color: "#ccc",
+    textAlign: "center",
     paddingVertical: 16,
   },
 
   // Task Item
   taskItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fafafa',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fafafa",
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 14,
@@ -345,30 +354,30 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#ccc',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderColor: "#ccc",
+    alignItems: "center",
+    justifyContent: "center",
     flexShrink: 0,
   },
   checkboxChecked: {
-    backgroundColor: '#26C6DA',
-    borderColor: '#26C6DA',
+    backgroundColor: "#26C6DA",
+    borderColor: "#26C6DA",
   },
   checkmark: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   taskTitle: {
     flex: 1,
     fontSize: 14,
-    color: '#333',
+    color: "#333",
     lineHeight: 20,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   taskTitleCompleted: {
-    textDecorationLine: 'line-through',
-    color: '#bbb',
+    textDecorationLine: "line-through",
+    color: "#bbb",
   },
   deleteBtn: {
     padding: 4,
@@ -376,57 +385,49 @@ const styles = StyleSheet.create({
   },
   deleteIcon: {
     fontSize: 16,
-    color: '#ccc',
+    color: "#ccc",
   },
 
   // Bottom Nav
   bottomNav: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
     paddingVertical: 10,
     paddingHorizontal: 10,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-    backgroundColor: '#fff',
+    borderTopColor: "#f0f0f0",
+    backgroundColor: "#fff",
   },
   navItem: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     gap: 4,
-  },
-  navIcon: {
-    fontSize: 22,
-    color: '#ccc',
-  },
-  navIconActive: {
-    fontSize: 22,
-    color: '#26C6DA',
   },
   navLabel: {
     fontSize: 11,
-    color: '#aaa',
-    fontWeight: '500',
+    color: "#aaa",
+    fontWeight: "500",
   },
   navLabelActive: {
     fontSize: 11,
-    color: '#26C6DA',
-    fontWeight: '700',
+    color: "#26C6DA",
+    fontWeight: "700",
   },
   navBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: -4,
     right: -8,
-    backgroundColor: '#FF5252',
+    backgroundColor: "#FF5252",
     borderRadius: 8,
     width: 16,
     height: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   navBadgeText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 9,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
