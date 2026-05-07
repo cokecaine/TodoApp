@@ -10,8 +10,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   Modal,
+  SafeAreaView,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 // Type tetap dipertahankan agar struktur data jelas
 type Task = {
@@ -77,6 +77,17 @@ export default function TodoScreen() {
         task.id === id ? { ...task, completed: !task.completed } : task,
       ),
     );
+  const addTask = () => {
+    // Nanti diisi oleh Affan di branch feature/add-task
+  };
+
+  const toggleTask = (id: string) => {
+    // Nanti diisi di branch feature/edit-task atau sejenisnya
+  };
+
+  // Delete Task Logic
+  const deleteTask = (id: string) => {
+    setTasks(tasks.filter((task) => task.id !== id));
   };
 
   const renderTask = ({ item }: { item: Task }) => (
@@ -100,6 +111,19 @@ export default function TodoScreen() {
         </Text>
         <Text style={styles.taskDate}>{formatDateDisplay(item.dueDate)}</Text>
       </View>
+      <Text
+        style={[styles.taskTitle, item.completed && styles.taskTitleCompleted]}
+        numberOfLines={2}
+      >
+        {item.title}
+      </Text>
+      <TouchableOpacity
+        style={styles.deleteBtn}
+        onPress={() => deleteTask(item.id)}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.deleteIcon}>🗑</Text>
+      </TouchableOpacity>
     </View>
   );
 
@@ -549,6 +573,14 @@ const styles = StyleSheet.create({
     textDecorationLine: "line-through",
     color: "#bbb",
   },
+  deleteBtn: {
+    padding: 4,
+    flexShrink: 0,
+  },
+  deleteIcon: {
+    fontSize: 16,
+    color: "#ccc",
+  },
 
   // Bottom Nav
   bottomNav: {
@@ -601,3 +633,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+}
