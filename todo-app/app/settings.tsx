@@ -6,130 +6,62 @@ import {
   StyleSheet,
   StatusBar,
   ScrollView,
-  Alert,
-  Switch,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import { useTasks, useTheme } from "./_layout";
-
 export default function SettingsScreen() {
-  const { tasks, clearAllTasks } = useTasks();
-  const { isDark, toggleTheme, colors } = useTheme();
-
-
-  const handleClearAllData = () => {
-    if (tasks.length === 0) {
-      Alert.alert("No Data", "There are no tasks to delete.");
-      return;
-    }
-    Alert.alert(
-      "Clear All Data",
-      `This will permanently delete all ${tasks.length} task(s). Are you sure?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete All",
-          style: "destructive",
-          onPress: clearAllTasks,
-        },
-      ]
-    );
-  };
-
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+    <SafeAreaView style={styles.safe}>
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>Settings</Text>
+          <Text style={styles.headerTitle}>Settings</Text>
         </View>
 
-        {/* Appearance */}
+        {/* Settings Sections */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Appearance</Text>
-
-          {/* Theme toggle */}
-          <TouchableOpacity
-            style={[
-              styles.settingItem,
-              { backgroundColor: colors.surface, borderBottomColor: colors.border },
-            ]}
-            onPress={toggleTheme}
-            activeOpacity={0.7}
-          >
+          <Text style={styles.sectionTitle}>Appearance</Text>
+          <TouchableOpacity style={styles.settingItem} activeOpacity={0.7}>
             <View style={styles.settingLeft}>
               <MaterialCommunityIcons
                 name="palette"
                 size={24}
-                color={colors.accent}
+                color="#26C6DA"
               />
               <View style={styles.settingContent}>
-                <Text style={[styles.settingLabel, { color: colors.text }]}>Theme</Text>
-                <Text style={[styles.settingDescription, { color: colors.textMuted }]}>
-                  {isDark ? "Dark" : "Light"} — tap to switch
-                </Text>
+                <Text style={styles.settingLabel}>Theme</Text>
+                <Text style={styles.settingDescription}>Light</Text>
               </View>
             </View>
-            {/* Switch yang menunjukkan status dark mode */}
-            <Switch
-              value={isDark}
-              onValueChange={toggleTheme}
-              trackColor={{ false: "#e0e0e0", true: colors.accentLight }}
-              thumbColor={isDark ? colors.accent : "#fff"}
+            <MaterialCommunityIcons
+              name="chevron-right"
+              size={24}
+              color="#ccc"
             />
           </TouchableOpacity>
         </View>
 
-        {/* Data */}
+        {/* Danger Zone */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Data</Text>
-
-          {/* Info jumlah tasks */}
-          <View
-            style={[
-              styles.settingItem,
-              { backgroundColor: colors.surface, borderBottomColor: colors.border },
-            ]}
+          <TouchableOpacity
+            style={[styles.settingItem, styles.dangerItem]}
+            activeOpacity={0.7}
           >
             <View style={styles.settingLeft}>
               <MaterialCommunityIcons
-                name="format-list-checks"
+                name="trash-can"
                 size={24}
-                color={colors.accent}
+                color="#FF6B6B"
               />
               <View style={styles.settingContent}>
-                <Text style={[styles.settingLabel, { color: colors.text }]}>Total Tasks</Text>
-                <Text style={[styles.settingDescription, { color: colors.textMuted }]}>
-                  {tasks.length} task(s) stored
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
-        {/* Danger Zone */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Danger Zone</Text>
-
-          {/* onPress sekarang terhubung ke handleClearAllData */}
-          <TouchableOpacity
-            style={[
-              styles.settingItem,
-              { backgroundColor: colors.dangerBg, borderBottomColor: colors.dangerBorder },
-            ]}
-            activeOpacity={0.7}
-            onPress={handleClearAllData}
-          >
-            <View style={styles.settingLeft}>
-              <MaterialCommunityIcons name="trash-can" size={24} color={colors.danger} />
-              <View style={styles.settingContent}>
-                <Text style={[styles.settingLabel, { color: colors.danger }]}>
+                <Text style={[styles.settingLabel, styles.dangerText]}>
                   Clear All Data
                 </Text>
-                <Text style={[styles.settingDescription, { color: colors.textMuted }]}>
+                <Text style={styles.settingDescription}>
                   Delete all tasks permanently
                 </Text>
               </View>
@@ -144,26 +76,30 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { 
-    flex: 1, 
+  safe: {
+    flex: 1,
+    backgroundColor: "#fff",
   },
-  container: { 
-    flex: 1, 
+  container: {
+    flex: 1,
   },
-  header: { 
-    paddingHorizontal: 20, 
-    paddingVertical: 20 
+  header: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
   },
-  headerTitle: { 
-    fontSize: 28, 
-    fontWeight: "bold" 
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#333",
   },
-  section: { 
-    marginBottom: 24 
+  section: {
+    marginBottom: 24,
+    paddingHorizontal: 0,
   },
   sectionTitle: {
     fontSize: 14,
     fontWeight: "700",
+    color: "#999",
     marginLeft: 20,
     marginBottom: 12,
     textTransform: "uppercase",
@@ -175,23 +111,49 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
+    backgroundColor: "#f9f9f9",
     borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
   },
-  settingLeft: { 
-    flexDirection: "row", 
-    alignItems: "center", 
-    flex: 1 
+  settingLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
   },
-  settingContent: { 
-    marginLeft: 16, 
-    flex: 1 
+  settingContent: {
+    marginLeft: 16,
+    flex: 1,
   },
-  settingLabel: { 
-    fontSize: 16, 
-    fontWeight: "600", 
-    marginBottom: 4 
+  settingLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 4,
   },
-  settingDescription: { 
-    fontSize: 13 
+  settingDescription: {
+    fontSize: 13,
+    color: "#999",
+  },
+  toggle: {
+    width: 50,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#e0e0e0",
+    justifyContent: "center",
+    paddingHorizontal: 2,
+  },
+  toggleOff: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#fff",
+    alignSelf: "flex-start",
+  },
+  dangerItem: {
+    backgroundColor: "#fff5f5",
+    borderBottomColor: "#ffe0e0",
+  },
+  dangerText: {
+    color: "#FF6B6B",
   },
 });
