@@ -9,43 +9,22 @@ import {
   StatusBar,
   KeyboardAvoidingView,
   Platform,
-  Modal,
-  SafeAreaView,
-} from "react-native";
-
-// Type tetap dipertahankan agar struktur data jelas
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-
-// Type is preserved to keep data structure clear
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-type Task = {
-  id: string;
-  title: string;
-  completed: boolean;
-  dueDate?: string; // Format: "YYYY-MM-DD"
-};
+// BARU: import dari _layout
+import { useTasks, useTheme } from "./_layout";
 
 export default function TodoScreen() {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const { tasks, addTask, toggleTask, deleteTask } = useTasks();
+  const { colors } = useTheme();
+
   const [inputText, setInputText] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [isDateEnabled, setIsDateEnabled] = useState(false);
-};
-
-export default function TodoScreen() {
-  // Data initialized (Task for Affan to connect to database/state)
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [inputText, setInputText] = useState("");
 
   const activeTasks = tasks.filter((t) => !t.completed);
   const completedTasks = tasks.filter((t) => t.completed);
 
-  // Format date to string (YYYY-MM-DD)
   const formatDateString = (date: Date): string => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -53,7 +32,6 @@ export default function TodoScreen() {
     return `${year}-${month}-${day}`;
   };
 
-  // Format date for display
   const formatDateDisplay = (dateString?: string): string => {
     if (!dateString) return "No due date";
     const [year, month, day] = dateString.split("-");
@@ -65,52 +43,27 @@ export default function TodoScreen() {
     });
   };
 
-  // Add Task
-  const addTask = () => {
+  const handleAddTask = () => {
     if (inputText.trim() === "") return;
-
-    const newTask: Task = {
+    addTask({
       id: Date.now().toString(),
       title: inputText.trim(),
       completed: false,
       dueDate: isDateEnabled ? formatDateString(selectedDate) : undefined,
-    };
-
-    setTasks([...tasks, newTask]);
+    });
     setInputText("");
     setSelectedDate(new Date());
     setIsDateEnabled(false);
   };
 
-  // Toggle Task
-  const toggleTask = (id: string) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task
-      )
-    );
-  };
-
-  // Delete Task
-  const deleteTask = (id: string) => {
-    setTasks(tasks.filter((task) => task.id !== id));
-  // Logic functions left empty (Just framework)
-  const addTask = () => {
-    // Will be filled by Affan in feature/add-task branch
-  };
-
-  const toggleTask = (id: string) => {
-    // Will be filled in feature/edit-task branch or similar
-  };
-
-  const deleteTask = (id: string) => {
-    // Nanti diisi di branch feature/delete-task
-  };
-
-  const renderTask = ({ item }: { item: Task }) => (
-    <View style={styles.taskItem}>
+  const renderTask = ({ item }: { item: (typeof tasks)[0] }) => (
+    <View style={[styles.taskItem, { backgroundColor: colors.cardBg }]}>
       <TouchableOpacity
-        style={[styles.checkbox, item.completed && styles.checkboxChecked]}
+        style={[
+          styles.checkbox,
+          { borderColor: colors.borderStrong },
+          item.completed && { backgroundColor: colors.accent, borderColor: colors.accent },
+        ]}
         onPress={() => toggleTask(item.id)}
         activeOpacity={0.7}
       >
@@ -118,19 +71,19 @@ export default function TodoScreen() {
       </TouchableOpacity>
       <View style={styles.taskContent}>
         <Text
-          style={[styles.taskTitle, item.completed && styles.taskTitleCompleted]}
+          style={[
+            styles.taskTitle,
+            { color: colors.text },
+            item.completed && { textDecorationLine: "line-through", color: colors.textLight },
+          ]}
           numberOfLines={2}
         >
           {item.title}
         </Text>
-        <Text style={styles.taskDate}>{formatDateDisplay(item.dueDate)}</Text>
+        <Text style={[styles.taskDate, { color: colors.textMuted }]}>
+          {formatDateDisplay(item.dueDate)}
+        </Text>
       </View>
-      <Text
-        style={[styles.taskTitle, item.completed && styles.taskTitleCompleted]}
-        numberOfLines={2}
-      >
-        {item.title}
-      </Text>
       <TouchableOpacity
         style={styles.deleteBtn}
         onPress={() => deleteTask(item.id)}
@@ -142,26 +95,27 @@ export default function TodoScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
           <View style={styles.headerLeft}>
-            <View style={styles.logoIcon}>
+            <View style={[styles.logoIcon, { backgroundColor: colors.accent }]}>
               <Text style={styles.logoCheck}>✓</Text>
             </View>
-            <Text style={styles.headerTitle}>Todo</Text>
+            <Text style={[styles.headerTitle, { color: colors.accent }]}>Todo</Text>
           </View>
           <View style={styles.headerRight}>
-            <View style={styles.taskBadge}>
-              <Text style={styles.taskBadgeText}>{activeTasks.length} Tasks</Text>
+            <View style={[styles.taskBadge, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.taskBadgeText, { color: colors.textMuted }]}>
+                {activeTasks.length} Tasks
+              </Text>
             </View>
-            <Text style={styles.moreIcon}>•••</Text>
           </View>
         </View>
 
@@ -173,164 +127,124 @@ export default function TodoScreen() {
             <>
               {/* Create Task Section */}
               <View style={styles.createSection}>
-                <Text style={styles.sectionTitle}>Create Task</Text>
-                <View style={styles.inputRow}>
-                  <Text style={styles.plusIcon}>＋</Text>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>Create Task</Text>
+                <View style={[styles.inputRow, { backgroundColor: colors.inputBg }]}>
+                  <Text style={[styles.plusIcon, { color: colors.accent }]}>＋</Text>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, { color: colors.text }]}
                     placeholder="What needs to be done?"
-                    placeholderTextColor="#aaa"
+                    placeholderTextColor={colors.textLight}
                     value={inputText}
                     onChangeText={setInputText}
-                    onSubmitEditing={addTask}
+                    onSubmitEditing={handleAddTask}
                     returnKeyType="done"
                   />
                   <TouchableOpacity
-                    style={styles.addBtn}
-                    onPress={addTask}
+                    style={[styles.addBtn, { backgroundColor: colors.accent }]}
+                    onPress={handleAddTask}
                     activeOpacity={0.8}
                   >
                     <Text style={styles.addBtnText}>Add</Text>
                   </TouchableOpacity>
                 </View>
 
-                {/* Date Toggle Button */}
+                {/* Date Toggle */}
                 <TouchableOpacity
                   style={[
                     styles.dateToggleBtn,
-                    isDateEnabled && styles.dateToggleBtnActive,
+                    {
+                      backgroundColor: colors.background,
+                      borderColor: isDateEnabled ? colors.accent : colors.borderStrong,
+                    },
+                    isDateEnabled && { backgroundColor: colors.accentLight },
                   ]}
                   onPress={() => setIsDateEnabled(!isDateEnabled)}
                   activeOpacity={0.7}
                 >
                   <Text style={styles.dateToggleIcon}>📅</Text>
-                  <Text
-                    style={[
-                      styles.dateToggleText,
-                      isDateEnabled && styles.dateToggleTextActive,
-                    ]}
-                  >
+                  <Text style={[styles.dateToggleText, { color: isDateEnabled ? colors.accent : colors.textMuted }]}>
                     {isDateEnabled ? "Remove Date" : "Add Date"}
                   </Text>
                 </TouchableOpacity>
 
-                {/* Date Picker - Only show if enabled */}
+                {/* Date Picker */}
                 {isDateEnabled && (
                   <View style={styles.datePickerSection}>
                     <TouchableOpacity
-                      style={styles.datePickerBtn}
+                      style={[styles.datePickerBtn, { backgroundColor: colors.inputBg }]}
                       onPress={() =>
                         setSelectedDate(
-                          new Date(
-                            selectedDate.getFullYear(),
-                            selectedDate.getMonth(),
-                            selectedDate.getDate() - 1
-                          )
+                          new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate() - 1)
                         )
                       }
                       activeOpacity={0.7}
                     >
-                      <Text style={styles.datePickerArrow}>◀</Text>
+                      <Text style={[styles.datePickerArrow, { color: colors.accent }]}>◀</Text>
                     </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={styles.dateDisplay}
-                      onPress={() => setShowDatePicker(!showDatePicker)}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={styles.dateDisplayText}>
+                    <View style={[styles.dateDisplay, { backgroundColor: colors.inputBg }]}>
+                      <Text style={[styles.dateDisplayText, { color: colors.text }]}>
                         📅 {formatDateDisplay(formatDateString(selectedDate))}
                       </Text>
-                    </TouchableOpacity>
-
+                    </View>
                     <TouchableOpacity
-                      style={styles.datePickerBtn}
+                      style={[styles.datePickerBtn, { backgroundColor: colors.inputBg }]}
                       onPress={() =>
                         setSelectedDate(
-                          new Date(
-                            selectedDate.getFullYear(),
-                            selectedDate.getMonth(),
-                            selectedDate.getDate() + 1
-                          )
+                          new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate() + 1)
                         )
                       }
                       activeOpacity={0.7}
                     >
-                      <Text style={styles.datePickerArrow}>▶</Text>
+                      <Text style={[styles.datePickerArrow, { color: colors.accent }]}>▶</Text>
                     </TouchableOpacity>
                   </View>
                 )}
               </View>
 
-              {/* Active Tasks Section */}
+              {/* Active Tasks */}
               <View style={styles.listSection}>
                 <View style={styles.listHeader}>
-                  <Text style={styles.listLabel}>ACTIVE TASKS</Text>
-                  <Text style={styles.gridIcon}>⊞</Text>
+                  <Text style={[styles.listLabel, { color: colors.textLight }]}>ACTIVE TASKS</Text>
                 </View>
                 {activeTasks.length === 0 && (
-                  <Text style={styles.emptyText}>No active tasks yet</Text>
+                  <Text style={[styles.emptyText, { color: colors.textLight }]}>No active tasks yet</Text>
                 )}
                 {activeTasks.map((item) => (
                   <View key={item.id}>{renderTask({ item })}</View>
                 ))}
               </View>
 
-              {/* Completed Tasks Section */}
+              {/* Completed Tasks */}
               <View style={styles.listSection}>
                 <View style={styles.listHeader}>
-                  <Text style={styles.listLabel}>COMPLETED</Text>
-                  <View style={styles.completedBadge}>
-                    <Text style={styles.completedBadgeText}>
+                  <Text style={[styles.listLabel, { color: colors.textLight }]}>COMPLETED</Text>
+                  <View style={[styles.completedBadge, { backgroundColor: colors.surface }]}>
+                    <Text style={[styles.completedBadgeText, { color: colors.textMuted }]}>
                       {completedTasks.length}
                     </Text>
                   </View>
                 </View>
                 {completedTasks.length === 0 && (
-                  <Text style={styles.emptyText}>No completed tasks yet</Text>
+                  <Text style={[styles.emptyText, { color: colors.textLight }]}>No completed tasks yet</Text>
                 )}
                 {completedTasks.map((item) => (
                   <View key={item.id}>{renderTask({ item })}</View>
                 ))}
               </View>
-<<<<<<< HEAD
-
-=======
->>>>>>> feature/settings
               <View style={{ height: 100 }} />
             </>
           }
           showsVerticalScrollIndicator={false}
           style={styles.flex}
         />
-
-        {/* Bottom Navigation - Hanya 3 Menu (Focus Dihapus) */}
-        <View style={styles.bottomNav}>
-          <TouchableOpacity style={styles.navItem} activeOpacity={0.7}>
-            <Text style={styles.navIconActive}>☑</Text>
-            <Text style={styles.navLabelActive}>Tasks</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem} activeOpacity={0.7}>
-            <Text style={styles.navIcon}>📅</Text>
-            <Text style={styles.navLabel}>Calendar</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem} activeOpacity={0.7}>
-            <Text style={styles.navIcon}>⚙</Text>
-            <Text style={styles.navLabel}>Settings</Text>
-          </TouchableOpacity>
-        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#fff" },
+  safe: { flex: 1 },
   flex: { flex: 1 },
-
-  // Header
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -338,82 +252,47 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-    backgroundColor: "#fff",
   },
   headerLeft: { flexDirection: "row", alignItems: "center", gap: 8 },
   logoIcon: {
     width: 32,
     height: 32,
     borderRadius: 8,
-    backgroundColor: "#26C6DA",
     alignItems: "center",
     justifyContent: "center",
   },
   logoCheck: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#26C6DA",
-    letterSpacing: 0.5,
-  },
+  headerTitle: { fontSize: 20, fontWeight: "700", letterSpacing: 0.5 },
   headerRight: { flexDirection: "row", alignItems: "center", gap: 12 },
-  taskBadge: {
-    backgroundColor: "#f5f5f5",
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  taskBadgeText: { fontSize: 12, color: "#555", fontWeight: "500" },
-  moreIcon: { fontSize: 16, color: "#aaa", letterSpacing: 2 },
-
-  // Create Section
+  taskBadge: { borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
+  taskBadgeText: { fontSize: 12, fontWeight: "500" },
   createSection: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 8 },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: "#1a1a1a",
-    marginBottom: 16,
-  },
+  sectionTitle: { fontSize: 22, fontWeight: "800", marginBottom: 16 },
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f7f7f7",
     borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: 4,
     gap: 8,
   },
-  plusIcon: { fontSize: 18, color: "#26C6DA", fontWeight: "300" },
-  input: { flex: 1, fontSize: 15, color: "#333", paddingVertical: 12 },
-  addBtn: {
-    backgroundColor: "#26C6DA",
-    borderRadius: 10,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-  },
+  plusIcon: { fontSize: 18 },
+  input: { flex: 1, fontSize: 15, paddingVertical: 12 },
+  addBtn: { borderRadius: 10, paddingHorizontal: 18, paddingVertical: 10 },
   addBtnText: { color: "#fff", fontWeight: "700", fontSize: 14 },
-
-  // Date Toggle
   dateToggleBtn: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#fff",
     borderWidth: 2,
-    borderColor: "#e0e0e0",
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 10,
     marginTop: 12,
     gap: 8,
   },
-  dateToggleBtnActive: { backgroundColor: "#e0f7fa", borderColor: "#26C6DA" },
   dateToggleIcon: { fontSize: 18 },
-  dateToggleText: { color: "#666", fontWeight: "600", fontSize: 14 },
-  dateToggleTextActive: { color: "#26C6DA" },
-
-  // Date Picker
+  dateToggleText: { fontWeight: "600", fontSize: 14 },
   datePickerSection: {
     flexDirection: "row",
     alignItems: "center",
@@ -422,26 +301,22 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   datePickerBtn: {
-    backgroundColor: "#f7f7f7",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
     justifyContent: "center",
     alignItems: "center",
   },
-  datePickerArrow: { fontSize: 18, color: "#26C6DA", fontWeight: "600" },
+  datePickerArrow: { fontSize: 18, fontWeight: "600" },
   dateDisplay: {
     flex: 1,
-    backgroundColor: "#f7f7f7",
     borderRadius: 8,
     paddingHorizontal: 14,
     paddingVertical: 10,
     justifyContent: "center",
     alignItems: "center",
   },
-  dateDisplayText: { fontSize: 14, color: "#333", fontWeight: "600" },
-
-  // List Section
+  dateDisplayText: { fontSize: 14, fontWeight: "600" },
   listSection: { paddingHorizontal: 20, paddingTop: 24 },
   listHeader: {
     flexDirection: "row",
@@ -449,32 +324,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 12,
   },
-  listLabel: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#aaa",
-    letterSpacing: 1.2,
-  },
-  gridIcon: { fontSize: 18, color: "#ccc" },
-  completedBadge: {
-    backgroundColor: "#f0f0f0",
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
-  completedBadgeText: { fontSize: 12, color: "#888", fontWeight: "600" },
-  emptyText: {
-    fontSize: 14,
-    color: "#ccc",
-    textAlign: "center",
-    paddingVertical: 16,
-  },
-
-  // Task Item
+  listLabel: { fontSize: 12, fontWeight: "700", letterSpacing: 1.2 },
+  completedBadge: { borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2 },
+  completedBadgeText: { fontSize: 12, fontWeight: "600" },
+  emptyText: { fontSize: 14, textAlign: "center", paddingVertical: 16 },
   taskItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fafafa",
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 14,
@@ -486,283 +342,14 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: "#ccc",
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
   },
-  checkboxChecked: { backgroundColor: "#26C6DA", borderColor: "#26C6DA" },
   checkmark: { color: "#fff", fontSize: 12, fontWeight: "bold" },
   taskContent: { flex: 1 },
-  taskTitle: {
-    fontSize: 14,
-    color: "#333",
-    lineHeight: 20,
-    fontWeight: "500",
-  },
-  taskDate: { fontSize: 12, color: "#999", marginTop: 4 },
-  taskTitleCompleted: { textDecorationLine: "line-through", color: "#bbb" },
+  taskTitle: { fontSize: 14, lineHeight: 20, fontWeight: "500" },
+  taskDate: { fontSize: 12, marginTop: 4 },
   deleteBtn: { padding: 4, flexShrink: 0 },
-  deleteIcon: { fontSize: 16, color: "#ccc" },
-
-  // Bottom Nav
-  bottomNav: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
-    backgroundColor: "#fff",
-  },
-  navItem: {
-    flex: 1,
-    alignItems: "center",
-    gap: 4,
-  },
-  navIcon: {
-    fontSize: 22,
-    color: "#ccc",
-  },
-  navIconActive: {
-    fontSize: 22,
-    color: "#26C6DA",
-  },
-  navLabel: {
-    fontSize: 11,
-    color: "#aaa",
-    fontWeight: "500",
-  },
-  navLabelActive: {
-    fontSize: 11,
-    color: "#26C6DA",
-    fontWeight: "700",
-  },
-  navBadge: {
-    position: "absolute",
-    top: -4,
-    right: -8,
-    backgroundColor: "#FF5252",
-    borderRadius: 8,
-    width: 16,
-    height: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  navBadgeText: {
-    color: "#fff",
-    fontSize: 9,
-    fontWeight: "bold",
-  },
-});
-      </KeyboardAvoidingView>
-    </SafeAreaView>
-  );
-}
-
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  flex: {
-    flex: 1,
-  },
-
-  // Header
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-    backgroundColor: "#fff",
-  },
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  logoIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: "#26C6DA",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logoCheck: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#26C6DA",
-    letterSpacing: 0.5,
-  },
-  headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  taskBadge: {
-    backgroundColor: "#f5f5f5",
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  taskBadgeText: {
-    fontSize: 12,
-    color: "#555",
-    fontWeight: "500",
-  },
-  moreIcon: {
-    fontSize: 16,
-    color: "#aaa",
-    letterSpacing: 2,
-  },
-
-  // Create Section
-  createSection: {
-    paddingHorizontal: 20,
-    paddingTop: 24,
-    paddingBottom: 8,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: "#1a1a1a",
-    marginBottom: 16,
-  },
-  inputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f7f7f7",
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    paddingVertical: 4,
-    gap: 8,
-  },
-  plusIcon: {
-    fontSize: 18,
-    color: "#26C6DA",
-    fontWeight: "300",
-  },
-  input: {
-    flex: 1,
-    fontSize: 15,
-    color: "#333",
-    paddingVertical: 12,
-  },
-  addBtn: {
-    backgroundColor: "#26C6DA",
-    borderRadius: 10,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-  },
-  addBtnText: {
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 14,
-  },
-
-  // List Section
-  listSection: {
-    paddingHorizontal: 20,
-    paddingTop: 24,
-  },
-  listHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 12,
-  },
-  listLabel: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#aaa",
-    letterSpacing: 1.2,
-  },
-  gridIcon: {
-    fontSize: 18,
-    color: "#ccc",
-  },
-  completedBadge: {
-    backgroundColor: "#f0f0f0",
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
-  completedBadgeText: {
-    fontSize: 12,
-    color: "#888",
-    fontWeight: "600",
-  },
-  emptyText: {
-    fontSize: 14,
-    color: "#ccc",
-    textAlign: "center",
-    paddingVertical: 16,
-  },
-
-  // Task Item
-  taskItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fafafa",
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    marginBottom: 10,
-    gap: 12,
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#ccc",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-  },
-  checkboxChecked: {
-    backgroundColor: "#26C6DA",
-    borderColor: "#26C6DA",
-  },
-  checkmark: {
-    color: "#fff",
-    fontSize: 12,
-    fontWeight: "bold",
-  },
-  taskTitle: {
-    flex: 1,
-    fontSize: 14,
-    color: "#333",
-    lineHeight: 20,
-    fontWeight: "500",
-  },
-  taskTitleCompleted: {
-    textDecorationLine: "line-through",
-    color: "#bbb",
-  },
-  deleteBtn: {
-    padding: 4,
-    flexShrink: 0,
-  },
-  deleteIcon: {
-    fontSize: 16,
-    color: "#ccc",
-  },
-});
-  navItem: { flex: 1, alignItems: "center", gap: 4 },
-  navIcon: { fontSize: 22, color: "#ccc" },
-  navIconActive: { fontSize: 22, color: "#26C6DA" },
-  navLabel: { fontSize: 11, color: "#aaa", fontWeight: "500" },
-  navLabelActive: { fontSize: 11, color: "#26C6DA", fontWeight: "700" },
+  deleteIcon: { fontSize: 16 },
 });

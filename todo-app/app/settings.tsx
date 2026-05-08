@@ -6,62 +6,130 @@ import {
   StyleSheet,
   StatusBar,
   ScrollView,
-  Platform,
+  Alert,
+  Switch,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+// BARU: import dari _layout
+import { useTasks, useTheme } from "./_layout";
 
 export default function SettingsScreen() {
-  return (
-    <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+  const { tasks, clearAllTasks } = useTasks();
+  const { isDark, toggleTheme, colors } = useTheme();
 
+  // BARU: konfirmasi sebelum hapus semua data
+  const handleClearAllData = () => {
+    if (tasks.length === 0) {
+      Alert.alert("No Data", "There are no tasks to delete.");
+      return;
+    }
+    Alert.alert(
+      "Clear All Data",
+      `This will permanently delete all ${tasks.length} task(s). Are you sure?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete All",
+          style: "destructive",
+          onPress: clearAllTasks,
+        },
+      ]
+    );
+  };
+
+  return (
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Settings</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Settings</Text>
         </View>
 
-        {/* Settings Sections */}
+        {/* Appearance */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Appearance</Text>
-          <TouchableOpacity style={styles.settingItem} activeOpacity={0.7}>
-            <View style={styles.settingLeft}>
-              <MaterialCommunityIcons
-                name="palette"
-                size={24}
-                color="#26C6DA"
-              />
-              <View style={styles.settingContent}>
-                <Text style={styles.settingLabel}>Theme</Text>
-                <Text style={styles.settingDescription}>Light</Text>
-              </View>
-            </View>
-            <MaterialCommunityIcons
-              name="chevron-right"
-              size={24}
-              color="#ccc"
-            />
-          </TouchableOpacity>
-        </View>
+          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Appearance</Text>
 
-        {/* Danger Zone */}
-        <View style={styles.section}>
+          {/* DIUBAH: Theme toggle sekarang berfungsi */}
           <TouchableOpacity
-            style={[styles.settingItem, styles.dangerItem]}
+            style={[
+              styles.settingItem,
+              { backgroundColor: colors.surface, borderBottomColor: colors.border },
+            ]}
+            onPress={toggleTheme}
             activeOpacity={0.7}
           >
             <View style={styles.settingLeft}>
               <MaterialCommunityIcons
-                name="trash-can"
+                name="palette"
                 size={24}
-                color="#FF6B6B"
+                color={colors.accent}
               />
               <View style={styles.settingContent}>
-                <Text style={[styles.settingLabel, styles.dangerText]}>
+                <Text style={[styles.settingLabel, { color: colors.text }]}>Theme</Text>
+                <Text style={[styles.settingDescription, { color: colors.textMuted }]}>
+                  {isDark ? "Dark" : "Light"} — tap to switch
+                </Text>
+              </View>
+            </View>
+            {/* BARU: Switch yang menunjukkan status dark mode */}
+            <Switch
+              value={isDark}
+              onValueChange={toggleTheme}
+              trackColor={{ false: "#e0e0e0", true: colors.accentLight }}
+              thumbColor={isDark ? colors.accent : "#fff"}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* Data */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Data</Text>
+
+          {/* BARU: info jumlah tasks */}
+          <View
+            style={[
+              styles.settingItem,
+              { backgroundColor: colors.surface, borderBottomColor: colors.border },
+            ]}
+          >
+            <View style={styles.settingLeft}>
+              <MaterialCommunityIcons
+                name="format-list-checks"
+                size={24}
+                color={colors.accent}
+              />
+              <View style={styles.settingContent}>
+                <Text style={[styles.settingLabel, { color: colors.text }]}>Total Tasks</Text>
+                <Text style={[styles.settingDescription, { color: colors.textMuted }]}>
+                  {tasks.length} task(s) stored
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Danger Zone */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Danger Zone</Text>
+
+          {/* DIUBAH: onPress sekarang terhubung ke handleClearAllData */}
+          <TouchableOpacity
+            style={[
+              styles.settingItem,
+              { backgroundColor: colors.dangerBg, borderBottomColor: colors.dangerBorder },
+            ]}
+            activeOpacity={0.7}
+            onPress={handleClearAllData}
+          >
+            <View style={styles.settingLeft}>
+              <MaterialCommunityIcons name="trash-can" size={24} color={colors.danger} />
+              <View style={styles.settingContent}>
+                <Text style={[styles.settingLabel, { color: colors.danger }]}>
                   Clear All Data
                 </Text>
-                <Text style={styles.settingDescription}>
+                <Text style={[styles.settingDescription, { color: colors.textMuted }]}>
                   Delete all tasks permanently
                 </Text>
               </View>
@@ -76,30 +144,14 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  container: {
-    flex: 1,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  section: {
-    marginBottom: 24,
-    paddingHorizontal: 0,
-  },
+  safe: { flex: 1 },
+  container: { flex: 1 },
+  header: { paddingHorizontal: 20, paddingVertical: 20 },
+  headerTitle: { fontSize: 28, fontWeight: "bold" },
+  section: { marginBottom: 24 },
   sectionTitle: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#999",
     marginLeft: 20,
     marginBottom: 12,
     textTransform: "uppercase",
@@ -111,49 +163,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: "#f9f9f9",
     borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
   },
-  settingLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
-  settingContent: {
-    marginLeft: 16,
-    flex: 1,
-  },
-  settingLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 4,
-  },
-  settingDescription: {
-    fontSize: 13,
-    color: "#999",
-  },
-  toggle: {
-    width: 50,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: "#e0e0e0",
-    justifyContent: "center",
-    paddingHorizontal: 2,
-  },
-  toggleOff: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: "#fff",
-    alignSelf: "flex-start",
-  },
-  dangerItem: {
-    backgroundColor: "#fff5f5",
-    borderBottomColor: "#ffe0e0",
-  },
-  dangerText: {
-    color: "#FF6B6B",
-  },
+  settingLeft: { flexDirection: "row", alignItems: "center", flex: 1 },
+  settingContent: { marginLeft: 16, flex: 1 },
+  settingLabel: { fontSize: 16, fontWeight: "600", marginBottom: 4 },
+  settingDescription: { fontSize: 13 },
 });
