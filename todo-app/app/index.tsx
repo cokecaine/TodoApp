@@ -14,6 +14,11 @@ import {
 } from "react-native";
 
 // Type tetap dipertahankan agar struktur data jelas
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+
+// Type is preserved to keep data structure clear
 type Task = {
   id: string;
   title: string;
@@ -28,6 +33,12 @@ export default function TodoScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isDateEnabled, setIsDateEnabled] = useState(false);
+};
+
+export default function TodoScreen() {
+  // Data initialized (Task for Affan to connect to database/state)
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [inputText, setInputText] = useState("");
 
   const activeTasks = tasks.filter((t) => !t.completed);
   const completedTasks = tasks.filter((t) => t.completed);
@@ -88,6 +99,17 @@ export default function TodoScreen() {
   // Delete Task Logic
   const deleteTask = (id: string) => {
     setTasks(tasks.filter((task) => task.id !== id));
+  // Logic functions left empty (Just framework)
+  const addTask = () => {
+    // Will be filled by Affan in feature/add-task branch
+  };
+
+  const toggleTask = (id: string) => {
+    // Will be filled in feature/edit-task branch or similar
+  };
+
+  const deleteTask = (id: string) => {
+    // Nanti diisi di branch feature/delete-task
   };
 
   const renderTask = ({ item }: { item: Task }) => (
@@ -633,4 +655,207 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
 }
+
+const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  flex: {
+    flex: 1,
+  },
+
+  // Header
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+    backgroundColor: "#fff",
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  logoIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: "#26C6DA",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  logoCheck: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#26C6DA",
+    letterSpacing: 0.5,
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  taskBadge: {
+    backgroundColor: "#f5f5f5",
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  taskBadgeText: {
+    fontSize: 12,
+    color: "#555",
+    fontWeight: "500",
+  },
+  moreIcon: {
+    fontSize: 16,
+    color: "#aaa",
+    letterSpacing: 2,
+  },
+
+  // Create Section
+  createSection: {
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    paddingBottom: 8,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: "800",
+    color: "#1a1a1a",
+    marginBottom: 16,
+  },
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f7f7f7",
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 4,
+    gap: 8,
+  },
+  plusIcon: {
+    fontSize: 18,
+    color: "#26C6DA",
+    fontWeight: "300",
+  },
+  input: {
+    flex: 1,
+    fontSize: 15,
+    color: "#333",
+    paddingVertical: 12,
+  },
+  addBtn: {
+    backgroundColor: "#26C6DA",
+    borderRadius: 10,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+  },
+  addBtnText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 14,
+  },
+
+  // List Section
+  listSection: {
+    paddingHorizontal: 20,
+    paddingTop: 24,
+  },
+  listHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  listLabel: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#aaa",
+    letterSpacing: 1.2,
+  },
+  gridIcon: {
+    fontSize: 18,
+    color: "#ccc",
+  },
+  completedBadge: {
+    backgroundColor: "#f0f0f0",
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  completedBadgeText: {
+    fontSize: 12,
+    color: "#888",
+    fontWeight: "600",
+  },
+  emptyText: {
+    fontSize: 14,
+    color: "#ccc",
+    textAlign: "center",
+    paddingVertical: 16,
+  },
+
+  // Task Item
+  taskItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fafafa",
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    marginBottom: 10,
+    gap: 12,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#ccc",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  checkboxChecked: {
+    backgroundColor: "#26C6DA",
+    borderColor: "#26C6DA",
+  },
+  checkmark: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  taskTitle: {
+    flex: 1,
+    fontSize: 14,
+    color: "#333",
+    lineHeight: 20,
+    fontWeight: "500",
+  },
+  taskTitleCompleted: {
+    textDecorationLine: "line-through",
+    color: "#bbb",
+  },
+  deleteBtn: {
+    padding: 4,
+    flexShrink: 0,
+  },
+  deleteIcon: {
+    fontSize: 16,
+    color: "#ccc",
+  },
+});
