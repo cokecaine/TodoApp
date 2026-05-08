@@ -19,6 +19,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 // Type is preserved to keep data structure clear
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 type Task = {
   id: string;
   title: string;
@@ -27,7 +30,6 @@ type Task = {
 };
 
 export default function TodoScreen() {
-  // Data dikosongkan (Tugas Affan untuk menghubungkan ke database/state)
   const [tasks, setTasks] = useState<Task[]>([]);
   const [inputText, setInputText] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -63,11 +65,9 @@ export default function TodoScreen() {
     });
   };
 
-  // Add Task Logic
+  // Add Task
   const addTask = () => {
-    if (inputText.trim() === "") {
-      return; // Don't add empty tasks
-    }
+    if (inputText.trim() === "") return;
 
     const newTask: Task = {
       id: Date.now().toString(),
@@ -78,25 +78,20 @@ export default function TodoScreen() {
 
     setTasks([...tasks, newTask]);
     setInputText("");
-    setSelectedDate(new Date()); // Reset to today
-    setIsDateEnabled(false); // Reset date enabled toggle
+    setSelectedDate(new Date());
+    setIsDateEnabled(false);
   };
 
+  // Toggle Task
   const toggleTask = (id: string) => {
     setTasks(
       tasks.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task,
-      ),
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
     );
-  const addTask = () => {
-    // Nanti diisi oleh Affan di branch feature/add-task
   };
 
-  const toggleTask = (id: string) => {
-    // Nanti diisi di branch feature/edit-task atau sejenisnya
-  };
-
-  // Delete Task Logic
+  // Delete Task
   const deleteTask = (id: string) => {
     setTasks(tasks.filter((task) => task.id !== id));
   // Logic functions left empty (Just framework)
@@ -123,10 +118,7 @@ export default function TodoScreen() {
       </TouchableOpacity>
       <View style={styles.taskContent}>
         <Text
-          style={[
-            styles.taskTitle,
-            item.completed && styles.taskTitleCompleted,
-          ]}
+          style={[styles.taskTitle, item.completed && styles.taskTitleCompleted]}
           numberOfLines={2}
         >
           {item.title}
@@ -167,9 +159,7 @@ export default function TodoScreen() {
           </View>
           <View style={styles.headerRight}>
             <View style={styles.taskBadge}>
-              <Text style={styles.taskBadgeText}>
-                {activeTasks.length} Tasks
-              </Text>
+              <Text style={styles.taskBadgeText}>{activeTasks.length} Tasks</Text>
             </View>
             <Text style={styles.moreIcon}>•••</Text>
           </View>
@@ -192,6 +182,8 @@ export default function TodoScreen() {
                     placeholderTextColor="#aaa"
                     value={inputText}
                     onChangeText={setInputText}
+                    onSubmitEditing={addTask}
+                    returnKeyType="done"
                   />
                   <TouchableOpacity
                     style={styles.addBtn}
@@ -232,8 +224,8 @@ export default function TodoScreen() {
                           new Date(
                             selectedDate.getFullYear(),
                             selectedDate.getMonth(),
-                            selectedDate.getDate() - 1,
-                          ),
+                            selectedDate.getDate() - 1
+                          )
                         )
                       }
                       activeOpacity={0.7}
@@ -258,8 +250,8 @@ export default function TodoScreen() {
                           new Date(
                             selectedDate.getFullYear(),
                             selectedDate.getMonth(),
-                            selectedDate.getDate() + 1,
-                          ),
+                            selectedDate.getDate() + 1
+                          )
                         )
                       }
                       activeOpacity={0.7}
@@ -301,7 +293,10 @@ export default function TodoScreen() {
                   <View key={item.id}>{renderTask({ item })}</View>
                 ))}
               </View>
+<<<<<<< HEAD
 
+=======
+>>>>>>> feature/settings
               <View style={{ height: 100 }} />
             </>
           }
@@ -332,13 +327,8 @@ export default function TodoScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  flex: {
-    flex: 1,
-  },
+  safe: { flex: 1, backgroundColor: "#fff" },
+  flex: { flex: 1 },
 
   // Header
   header: {
@@ -351,11 +341,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#f0f0f0",
     backgroundColor: "#fff",
   },
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
+  headerLeft: { flexDirection: "row", alignItems: "center", gap: 8 },
   logoIcon: {
     width: 32,
     height: 32,
@@ -364,45 +350,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  logoCheck: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
+  logoCheck: { color: "#fff", fontSize: 16, fontWeight: "bold" },
   headerTitle: {
     fontSize: 20,
     fontWeight: "700",
     color: "#26C6DA",
     letterSpacing: 0.5,
   },
-  headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
+  headerRight: { flexDirection: "row", alignItems: "center", gap: 12 },
   taskBadge: {
     backgroundColor: "#f5f5f5",
     borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  taskBadgeText: {
-    fontSize: 12,
-    color: "#555",
-    fontWeight: "500",
-  },
-  moreIcon: {
-    fontSize: 16,
-    color: "#aaa",
-    letterSpacing: 2,
-  },
+  taskBadgeText: { fontSize: 12, color: "#555", fontWeight: "500" },
+  moreIcon: { fontSize: 16, color: "#aaa", letterSpacing: 2 },
 
   // Create Section
-  createSection: {
-    paddingHorizontal: 20,
-    paddingTop: 24,
-    paddingBottom: 8,
-  },
+  createSection: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 8 },
   sectionTitle: {
     fontSize: 22,
     fontWeight: "800",
@@ -418,30 +384,17 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     gap: 8,
   },
-  plusIcon: {
-    fontSize: 18,
-    color: "#26C6DA",
-    fontWeight: "300",
-  },
-  input: {
-    flex: 1,
-    fontSize: 15,
-    color: "#333",
-    paddingVertical: 12,
-  },
+  plusIcon: { fontSize: 18, color: "#26C6DA", fontWeight: "300" },
+  input: { flex: 1, fontSize: 15, color: "#333", paddingVertical: 12 },
   addBtn: {
     backgroundColor: "#26C6DA",
     borderRadius: 10,
     paddingHorizontal: 18,
     paddingVertical: 10,
   },
-  addBtnText: {
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 14,
-  },
+  addBtnText: { color: "#fff", fontWeight: "700", fontSize: 14 },
 
-  // Date Toggle Button
+  // Date Toggle
   dateToggleBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -455,23 +408,12 @@ const styles = StyleSheet.create({
     marginTop: 12,
     gap: 8,
   },
-  dateToggleBtnActive: {
-    backgroundColor: "#e0f7fa",
-    borderColor: "#26C6DA",
-  },
-  dateToggleIcon: {
-    fontSize: 18,
-  },
-  dateToggleText: {
-    color: "#666",
-    fontWeight: "600",
-    fontSize: 14,
-  },
-  dateToggleTextActive: {
-    color: "#26C6DA",
-  },
+  dateToggleBtnActive: { backgroundColor: "#e0f7fa", borderColor: "#26C6DA" },
+  dateToggleIcon: { fontSize: 18 },
+  dateToggleText: { color: "#666", fontWeight: "600", fontSize: 14 },
+  dateToggleTextActive: { color: "#26C6DA" },
 
-  // Date Picker Section
+  // Date Picker
   datePickerSection: {
     flexDirection: "row",
     alignItems: "center",
@@ -487,11 +429,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  datePickerArrow: {
-    fontSize: 18,
-    color: "#26C6DA",
-    fontWeight: "600",
-  },
+  datePickerArrow: { fontSize: 18, color: "#26C6DA", fontWeight: "600" },
   dateDisplay: {
     flex: 1,
     backgroundColor: "#f7f7f7",
@@ -501,17 +439,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  dateDisplayText: {
-    fontSize: 14,
-    color: "#333",
-    fontWeight: "600",
-  },
+  dateDisplayText: { fontSize: 14, color: "#333", fontWeight: "600" },
 
   // List Section
-  listSection: {
-    paddingHorizontal: 20,
-    paddingTop: 24,
-  },
+  listSection: { paddingHorizontal: 20, paddingTop: 24 },
   listHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -524,21 +455,14 @@ const styles = StyleSheet.create({
     color: "#aaa",
     letterSpacing: 1.2,
   },
-  gridIcon: {
-    fontSize: 18,
-    color: "#ccc",
-  },
+  gridIcon: { fontSize: 18, color: "#ccc" },
   completedBadge: {
     backgroundColor: "#f0f0f0",
     borderRadius: 10,
     paddingHorizontal: 8,
     paddingVertical: 2,
   },
-  completedBadgeText: {
-    fontSize: 12,
-    color: "#888",
-    fontWeight: "600",
-  },
+  completedBadgeText: { fontSize: 12, color: "#888", fontWeight: "600" },
   emptyText: {
     fontSize: 14,
     color: "#ccc",
@@ -567,42 +491,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flexShrink: 0,
   },
-  checkboxChecked: {
-    backgroundColor: "#26C6DA",
-    borderColor: "#26C6DA",
-  },
-  checkmark: {
-    color: "#fff",
-    fontSize: 12,
-    fontWeight: "bold",
-  },
+  checkboxChecked: { backgroundColor: "#26C6DA", borderColor: "#26C6DA" },
+  checkmark: { color: "#fff", fontSize: 12, fontWeight: "bold" },
+  taskContent: { flex: 1 },
   taskTitle: {
-    flex: 1,
     fontSize: 14,
     color: "#333",
     lineHeight: 20,
     fontWeight: "500",
   },
-  taskContent: {
-    flex: 1,
-  },
-  taskDate: {
-    fontSize: 12,
-    color: "#999",
-    marginTop: 4,
-  },
-  taskTitleCompleted: {
-    textDecorationLine: "line-through",
-    color: "#bbb",
-  },
-  deleteBtn: {
-    padding: 4,
-    flexShrink: 0,
-  },
-  deleteIcon: {
-    fontSize: 16,
-    color: "#ccc",
-  },
+  taskDate: { fontSize: 12, color: "#999", marginTop: 4 },
+  taskTitleCompleted: { textDecorationLine: "line-through", color: "#bbb" },
+  deleteBtn: { padding: 4, flexShrink: 0 },
+  deleteIcon: { fontSize: 16, color: "#ccc" },
 
   // Bottom Nav
   bottomNav: {
@@ -858,4 +759,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#ccc",
   },
+});
+  navItem: { flex: 1, alignItems: "center", gap: 4 },
+  navIcon: { fontSize: 22, color: "#ccc" },
+  navIconActive: { fontSize: 22, color: "#26C6DA" },
+  navLabel: { fontSize: 11, color: "#aaa", fontWeight: "500" },
+  navLabelActive: { fontSize: 11, color: "#26C6DA", fontWeight: "700" },
 });
