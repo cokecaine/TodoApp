@@ -11,7 +11,8 @@ import {
   Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-// BARU: import dari _layout
+
+
 import { useTasks, useTheme } from "./_layout";
 
 export default function TodoScreen() {
@@ -243,8 +244,12 @@ export default function TodoScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
-  flex: { flex: 1 },
+  safe: { 
+    flex: 1, 
+  },
+  flex: { 
+    flex: 1, 
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -253,7 +258,11 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderBottomWidth: 1,
   },
-  headerLeft: { flexDirection: "row", alignItems: "center", gap: 8 },
+  headerLeft: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    gap: 8, 
+  },
   logoIcon: {
     width: 32,
     height: 32,
@@ -261,13 +270,40 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  logoCheck: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-  headerTitle: { fontSize: 20, fontWeight: "700", letterSpacing: 0.5 },
-  headerRight: { flexDirection: "row", alignItems: "center", gap: 12 },
-  taskBadge: { borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
-  taskBadgeText: { fontSize: 12, fontWeight: "500" },
-  createSection: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 8 },
-  sectionTitle: { fontSize: 22, fontWeight: "800", marginBottom: 16 },
+  
+  logoCheck: { 
+    color: "#fff", 
+    fontSize: 16, 
+    fontWeight: "bold", 
+  },
+  headerTitle: { 
+    fontSize: 20, 
+    fontWeight: "700", 
+    letterSpacing: 0.5, 
+  },
+  headerRight: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    gap: 12, 
+  },
+  taskBadge: { 
+    borderRadius: 12, 
+    paddingHorizontal: 10, paddingVertical: 4,
+   },
+  taskBadgeText: { 
+    fontSize: 12, 
+    fontWeight: "500", 
+  },
+  createSection: { 
+    paddingHorizontal: 20, 
+    paddingTop: 24, 
+    paddingBottom: 8, 
+  },
+  sectionTitle: { 
+    fontSize: 22, 
+    fontWeight: "800", 
+    marginBottom: 16, 
+  },
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -276,10 +312,25 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     gap: 8,
   },
-  plusIcon: { fontSize: 18 },
-  input: { flex: 1, fontSize: 15, paddingVertical: 12 },
-  addBtn: { borderRadius: 10, paddingHorizontal: 18, paddingVertical: 10 },
-  addBtnText: { color: "#fff", fontWeight: "700", fontSize: 14 },
+
+  plusIcon: { 
+    fontSize: 18, 
+  },
+  input: { 
+    flex: 1, 
+    fontSize: 15, 
+    paddingVertical: 12, 
+  },
+  addBtn: { 
+    borderRadius: 10, 
+    paddingHorizontal: 18, 
+    paddingVertical: 10, 
+  },
+  addBtnText: { 
+    color: "#fff", 
+    fontWeight: "700", 
+    fontSize: 14, 
+  },
   dateToggleBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -291,8 +342,14 @@ const styles = StyleSheet.create({
     marginTop: 12,
     gap: 8,
   },
-  dateToggleIcon: { fontSize: 18 },
-  dateToggleText: { fontWeight: "600", fontSize: 14 },
+
+  dateToggleIcon: { 
+    fontSize: 18, 
+  },
+  dateToggleText: { 
+    fontWeight: "600", 
+    fontSize: 14, 
+  },
   datePickerSection: {
     flexDirection: "row",
     alignItems: "center",
@@ -307,7 +364,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  datePickerArrow: { fontSize: 18, fontWeight: "600" },
+
+  datePickerArrow: { 
+    fontSize: 18, 
+    fontWeight: "600", 
+  },
   dateDisplay: {
     flex: 1,
     borderRadius: 8,
@@ -316,18 +377,44 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  dateDisplayText: { fontSize: 14, fontWeight: "600" },
-  listSection: { paddingHorizontal: 20, paddingTop: 24 },
+
+  dateDisplayText: { 
+    fontSize: 14,
+     fontWeight: "600",
+     },
+  listSection: { 
+    paddingHorizontal: 20, 
+    paddingTop: 24, 
+
+  },
   listHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 12,
   },
-  listLabel: { fontSize: 12, fontWeight: "700", letterSpacing: 1.2 },
-  completedBadge: { borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2 },
-  completedBadgeText: { fontSize: 12, fontWeight: "600" },
-  emptyText: { fontSize: 14, textAlign: "center", paddingVertical: 16 },
+
+  listLabel: { 
+    fontSize: 12, 
+    fontWeight: "700", 
+    letterSpacing: 1.2, 
+  },
+  completedBadge: { 
+    borderRadius: 10, 
+    paddingHorizontal: 8, 
+    paddingVertical: 2, 
+  },
+  completedBadgeText: { 
+    fontSize: 12, 
+    fontWeight: "600", 
+
+  },
+  emptyText: { 
+    fontSize: 14, 
+    textAlign: "center", 
+    paddingVertical: 16, 
+
+  },
   taskItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -346,10 +433,29 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flexShrink: 0,
   },
-  checkmark: { color: "#fff", fontSize: 12, fontWeight: "bold" },
-  taskContent: { flex: 1 },
-  taskTitle: { fontSize: 14, lineHeight: 20, fontWeight: "500" },
-  taskDate: { fontSize: 12, marginTop: 4 },
-  deleteBtn: { padding: 4, flexShrink: 0 },
-  deleteIcon: { fontSize: 16 },
+
+  checkmark: { 
+    color: "#fff", 
+    fontSize: 12, 
+    fontWeight: "bold", 
+  },
+  taskContent: { 
+    flex: 1, 
+  },
+  taskTitle: { 
+    fontSize: 14, 
+    lineHeight: 20, 
+    fontWeight: "500", 
+  },
+  taskDate: { 
+    fontSize: 12, 
+    marginTop: 4.
+  },
+  deleteBtn: { 
+    padding: 4, 
+    flexShrink: 0,
+  },
+  deleteIcon: { 
+    fontSize: 16, 
+  },
 });
