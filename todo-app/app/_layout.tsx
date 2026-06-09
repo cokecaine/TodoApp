@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { Tabs } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // ─── TYPES ────────────────────────────────────────────────────────
 export type Task = {
@@ -29,12 +30,6 @@ export function useTasks(): TasksContextType {
 }
 
 // ─── THEME CONTEXT ────────────────────────────────────────────────
-type ThemeContextType = {
-  isDark: boolean;
-  toggleTheme: () => void;
-  colors: typeof lightColors;
-};
-
 const lightColors = {
   background: "#ffffff",
   surface: "#f9f9f9",
@@ -73,6 +68,12 @@ const darkColors: typeof lightColors = {
   cardBg: "#1e1e1e",
 };
 
+type ThemeContextType = {
+  isDark: boolean;
+  toggleTheme: () => void;
+  colors: typeof lightColors;
+};
+
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function useTheme(): ThemeContextType {
@@ -83,8 +84,44 @@ export function useTheme(): ThemeContextType {
 
 // ─── ROOT LAYOUT ──────────────────────────────────────────────────
 export default function RootLayout() {
-  // Tasks state
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [isDark, setIsDark] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // LOAD data saat app dibuka
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [savedTasks, savedTheme] = await Promise.all([
+          AsyncStorage.getItem("@yolanda_tasks"),
+          AsyncStorage.getItem("@yolanda_theme"),
+        ]);
+        if (savedTasks !== null) setTasks(JSON.parse(savedTasks));
+        if (savedTheme !== null) setIsDark(JSON.parse(savedTheme));
+      } catch (e) {
+        console.error("Gagal memuat data", e);
+      } finally {
+        setIsLoaded(true);
+      }
+    };
+    loadData();
+  }, []);
+
+  // SAVE tasks setiap kali berubah (guard isLoaded supaya tidak overwrite saat pertama mount)
+  useEffect(() => {
+    if (!isLoaded) return;
+    AsyncStorage.setItem("@yolanda_tasks", JSON.stringify(tasks)).catch((e) =>
+      console.error("Gagal menyimpan tasks", e)
+    );
+  }, [tasks, isLoaded]);
+
+  // SAVE theme setiap kali berubah
+  useEffect(() => {
+    if (!isLoaded) return;
+    AsyncStorage.setItem("@yolanda_theme", JSON.stringify(isDark)).catch((e) =>
+      console.error("Gagal menyimpan theme", e)
+    );
+  }, [isDark, isLoaded]);
 
   const addTask = (task: Task) => setTasks((prev) => [...prev, task]);
   const toggleTask = (id: string) =>
@@ -95,8 +132,6 @@ export default function RootLayout() {
     setTasks((prev) => prev.filter((t) => t.id !== id));
   const clearAllTasks = () => setTasks([]);
 
-  // Theme state
-  const [isDark, setIsDark] = useState(false);
   const toggleTheme = () => setIsDark((prev) => !prev);
   const colors = isDark ? darkColors : lightColors;
 
@@ -112,13 +147,14 @@ export default function RootLayout() {
             tabBarShowLabel: true,
             tabBarActiveTintColor: "#26C6DA",
             tabBarInactiveTintColor: isDark ? "#555" : "#ccc",
+            // FIX: tambah padding bottom supaya tidak bentrok dengan navbar bawaan HP
             tabBarStyle: {
               backgroundColor: colors.tabBar,
               borderTopWidth: 1,
               borderTopColor: colors.border,
-              paddingBottom: 8,
+              paddingBottom: 40,   // <-- naik dari 8 ke 20, beri ruang navbar HP
               paddingTop: 8,
-              height: 60,
+              height: 105,          // <-- tinggi tab bar ditambah
             },
             tabBarLabelStyle: {
               fontSize: 11,
@@ -131,11 +167,7 @@ export default function RootLayout() {
             options={{
               title: "Todo",
               tabBarIcon: ({ color, size }) => (
-                <MaterialCommunityIcons
-                  name="check-all"
-                  size={size}
-                  color={color}
-                />
+                <MaterialCommunityIcons name="check-all" size={size} color={color} />
               ),
             }}
           />
@@ -144,11 +176,7 @@ export default function RootLayout() {
             options={{
               title: "Calendar",
               tabBarIcon: ({ color, size }) => (
-                <MaterialCommunityIcons
-                  name="calendar-month"
-                  size={size}
-                  color={color}
-                />
+                <MaterialCommunityIcons name="calendar-month" size={size} color={color} />
               ),
             }}
           />
@@ -157,11 +185,7 @@ export default function RootLayout() {
             options={{
               title: "Settings",
               tabBarIcon: ({ color, size }) => (
-                <MaterialCommunityIcons
-                  name="cog"
-                  size={size}
-                  color={color}
-                />
+                <MaterialCommunityIcons name="cog" size={size} color={color} />
               ),
             }}
           />

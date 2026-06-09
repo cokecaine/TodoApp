@@ -11,9 +11,7 @@ import {
   Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-
-import { useTasks, useTheme } from "./_layout";
+import { useTasks, useTheme, Task } from "./_layout";
 
 export default function TodoScreen() {
   const { tasks, addTask, toggleTask, deleteTask } = useTasks();
@@ -57,7 +55,9 @@ export default function TodoScreen() {
     setIsDateEnabled(false);
   };
 
-  const renderTask = ({ item }: { item: (typeof tasks)[0] }) => (
+  // FIX: renderTask sekarang menjadi komponen biasa yang menerima item langsung
+  // key prop dipindahkan ke pemanggil (.map), BUKAN di dalam fungsi ini
+  const renderTaskItem = (item: Task) => (
     <View style={[styles.taskItem, { backgroundColor: colors.cardBg }]}>
       <TouchableOpacity
         style={[
@@ -97,14 +97,21 @@ export default function TodoScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+      <StatusBar
+        barStyle={colors.background === "#ffffff" ? "dark-content" : "light-content"}
+      />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
         {/* Header */}
-        <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
+        <View
+          style={[
+            styles.header,
+            { backgroundColor: colors.background, borderBottomColor: colors.border },
+          ]}
+        >
           <View style={styles.headerLeft}>
             <View style={[styles.logoIcon, { backgroundColor: colors.accent }]}>
               <Text style={styles.logoCheck}>✓</Text>
@@ -126,9 +133,11 @@ export default function TodoScreen() {
           keyExtractor={() => "dummy"}
           ListHeaderComponent={
             <>
-              {/* Create Task Section */}
+              {/* Input Section */}
               <View style={styles.createSection}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>Create Task</Text>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                  Create Task
+                </Text>
                 <View style={[styles.inputRow, { backgroundColor: colors.inputBg }]}>
                   <Text style={[styles.plusIcon, { color: colors.accent }]}>＋</Text>
                   <TextInput
@@ -163,21 +172,25 @@ export default function TodoScreen() {
                   activeOpacity={0.7}
                 >
                   <Text style={styles.dateToggleIcon}>📅</Text>
-                  <Text style={[styles.dateToggleText, { color: isDateEnabled ? colors.accent : colors.textMuted }]}>
+                  <Text
+                    style={[
+                      styles.dateToggleText,
+                      { color: isDateEnabled ? colors.accent : colors.textMuted },
+                    ]}
+                  >
                     {isDateEnabled ? "Remove Date" : "Add Date"}
                   </Text>
                 </TouchableOpacity>
 
-                {/* Date Picker */}
                 {isDateEnabled && (
                   <View style={styles.datePickerSection}>
                     <TouchableOpacity
                       style={[styles.datePickerBtn, { backgroundColor: colors.inputBg }]}
-                      onPress={() =>
-                        setSelectedDate(
-                          new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate() - 1)
-                        )
-                      }
+                      onPress={() => {
+                        const d = new Date(selectedDate);
+                        d.setDate(d.getDate() - 1);
+                        setSelectedDate(d);
+                      }}
                       activeOpacity={0.7}
                     >
                       <Text style={[styles.datePickerArrow, { color: colors.accent }]}>◀</Text>
@@ -189,11 +202,11 @@ export default function TodoScreen() {
                     </View>
                     <TouchableOpacity
                       style={[styles.datePickerBtn, { backgroundColor: colors.inputBg }]}
-                      onPress={() =>
-                        setSelectedDate(
-                          new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate() + 1)
-                        )
-                      }
+                      onPress={() => {
+                        const d = new Date(selectedDate);
+                        d.setDate(d.getDate() + 1);
+                        setSelectedDate(d);
+                      }}
                       activeOpacity={0.7}
                     >
                       <Text style={[styles.datePickerArrow, { color: colors.accent }]}>▶</Text>
@@ -205,20 +218,27 @@ export default function TodoScreen() {
               {/* Active Tasks */}
               <View style={styles.listSection}>
                 <View style={styles.listHeader}>
-                  <Text style={[styles.listLabel, { color: colors.textLight }]}>ACTIVE TASKS</Text>
+                  <Text style={[styles.listLabel, { color: colors.textLight }]}>
+                    ACTIVE TASKS
+                  </Text>
                 </View>
                 {activeTasks.length === 0 && (
-                  <Text style={[styles.emptyText, { color: colors.textLight }]}>No active tasks yet</Text>
+                  <Text style={[styles.emptyText, { color: colors.textLight }]}>
+                    No active tasks yet
+                  </Text>
                 )}
+                {/* FIX: key prop ada di sini, bukan di dalam renderTaskItem */}
                 {activeTasks.map((item) => (
-                  <View key={item.id}>{renderTask({ item })}</View>
+                  <View key={item.id}>{renderTaskItem(item)}</View>
                 ))}
               </View>
 
               {/* Completed Tasks */}
               <View style={styles.listSection}>
                 <View style={styles.listHeader}>
-                  <Text style={[styles.listLabel, { color: colors.textLight }]}>COMPLETED</Text>
+                  <Text style={[styles.listLabel, { color: colors.textLight }]}>
+                    COMPLETED
+                  </Text>
                   <View style={[styles.completedBadge, { backgroundColor: colors.surface }]}>
                     <Text style={[styles.completedBadgeText, { color: colors.textMuted }]}>
                       {completedTasks.length}
@@ -226,12 +246,16 @@ export default function TodoScreen() {
                   </View>
                 </View>
                 {completedTasks.length === 0 && (
-                  <Text style={[styles.emptyText, { color: colors.textLight }]}>No completed tasks yet</Text>
+                  <Text style={[styles.emptyText, { color: colors.textLight }]}>
+                    No completed tasks yet
+                  </Text>
                 )}
+                {/* FIX: key prop ada di sini */}
                 {completedTasks.map((item) => (
-                  <View key={item.id}>{renderTask({ item })}</View>
+                  <View key={item.id}>{renderTaskItem(item)}</View>
                 ))}
               </View>
+
               <View style={{ height: 100 }} />
             </>
           }
@@ -244,12 +268,8 @@ export default function TodoScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { 
-    flex: 1, 
-  },
-  flex: { 
-    flex: 1, 
-  },
+  safe: { flex: 1 },
+  flex: { flex: 1 },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -258,11 +278,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderBottomWidth: 1,
   },
-  headerLeft: { 
-    flexDirection: "row", 
-    alignItems: "center", 
-    gap: 8, 
-  },
+  headerLeft: { flexDirection: "row", alignItems: "center", gap: 8 },
   logoIcon: {
     width: 32,
     height: 32,
@@ -270,40 +286,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  
-  logoCheck: { 
-    color: "#fff", 
-    fontSize: 16, 
-    fontWeight: "bold", 
-  },
-  headerTitle: { 
-    fontSize: 20, 
-    fontWeight: "700", 
-    letterSpacing: 0.5, 
-  },
-  headerRight: { 
-    flexDirection: "row", 
-    alignItems: "center", 
-    gap: 12, 
-  },
-  taskBadge: { 
-    borderRadius: 12, 
-    paddingHorizontal: 10, paddingVertical: 4,
-   },
-  taskBadgeText: { 
-    fontSize: 12, 
-    fontWeight: "500", 
-  },
-  createSection: { 
-    paddingHorizontal: 20, 
-    paddingTop: 24, 
-    paddingBottom: 8, 
-  },
-  sectionTitle: { 
-    fontSize: 22, 
-    fontWeight: "800", 
-    marginBottom: 16, 
-  },
+  logoCheck: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  headerTitle: { fontSize: 20, fontWeight: "700", letterSpacing: 0.5 },
+  headerRight: { flexDirection: "row", alignItems: "center", gap: 12 },
+  taskBadge: { borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
+  taskBadgeText: { fontSize: 12, fontWeight: "500" },
+  createSection: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 8 },
+  sectionTitle: { fontSize: 22, fontWeight: "800", marginBottom: 16 },
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -312,25 +301,10 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     gap: 8,
   },
-
-  plusIcon: { 
-    fontSize: 18, 
-  },
-  input: { 
-    flex: 1, 
-    fontSize: 15, 
-    paddingVertical: 12, 
-  },
-  addBtn: { 
-    borderRadius: 10, 
-    paddingHorizontal: 18, 
-    paddingVertical: 10, 
-  },
-  addBtnText: { 
-    color: "#fff", 
-    fontWeight: "700", 
-    fontSize: 14, 
-  },
+  plusIcon: { fontSize: 18 },
+  input: { flex: 1, fontSize: 15, paddingVertical: 12 },
+  addBtn: { borderRadius: 10, paddingHorizontal: 18, paddingVertical: 10 },
+  addBtnText: { color: "#fff", fontWeight: "700", fontSize: 14 },
   dateToggleBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -342,14 +316,8 @@ const styles = StyleSheet.create({
     marginTop: 12,
     gap: 8,
   },
-
-  dateToggleIcon: { 
-    fontSize: 18, 
-  },
-  dateToggleText: { 
-    fontWeight: "600", 
-    fontSize: 14, 
-  },
+  dateToggleIcon: { fontSize: 18 },
+  dateToggleText: { fontWeight: "600", fontSize: 14 },
   datePickerSection: {
     flexDirection: "row",
     alignItems: "center",
@@ -364,11 +332,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
-  datePickerArrow: { 
-    fontSize: 18, 
-    fontWeight: "600", 
-  },
+  datePickerArrow: { fontSize: 18, fontWeight: "600" },
   dateDisplay: {
     flex: 1,
     borderRadius: 8,
@@ -377,44 +341,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
-  dateDisplayText: { 
-    fontSize: 14,
-     fontWeight: "600",
-     },
-  listSection: { 
-    paddingHorizontal: 20, 
-    paddingTop: 24, 
-
-  },
+  dateDisplayText: { fontSize: 14, fontWeight: "600" },
+  listSection: { paddingHorizontal: 20, paddingTop: 24 },
   listHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 12,
   },
-
-  listLabel: { 
-    fontSize: 12, 
-    fontWeight: "700", 
-    letterSpacing: 1.2, 
-  },
-  completedBadge: { 
-    borderRadius: 10, 
-    paddingHorizontal: 8, 
-    paddingVertical: 2, 
-  },
-  completedBadgeText: { 
-    fontSize: 12, 
-    fontWeight: "600", 
-
-  },
-  emptyText: { 
-    fontSize: 14, 
-    textAlign: "center", 
-    paddingVertical: 16, 
-
-  },
+  listLabel: { fontSize: 12, fontWeight: "700", letterSpacing: 1.2 },
+  completedBadge: { borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2 },
+  completedBadgeText: { fontSize: 12, fontWeight: "600" },
+  emptyText: { fontSize: 14, textAlign: "center", paddingVertical: 16 },
   taskItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -433,29 +371,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flexShrink: 0,
   },
-
-  checkmark: { 
-    color: "#fff", 
-    fontSize: 12, 
-    fontWeight: "bold", 
-  },
-  taskContent: { 
-    flex: 1, 
-  },
-  taskTitle: { 
-    fontSize: 14, 
-    lineHeight: 20, 
-    fontWeight: "500", 
-  },
-  taskDate: { 
-    fontSize: 12, 
-    marginTop: 4.
-  },
-  deleteBtn: { 
-    padding: 4, 
-    flexShrink: 0,
-  },
-  deleteIcon: { 
-    fontSize: 16, 
-  },
+  checkmark: { color: "#fff", fontSize: 12, fontWeight: "bold" },
+  taskContent: { flex: 1 },
+  taskTitle: { fontSize: 14, lineHeight: 20, fontWeight: "500" },
+  taskDate: { fontSize: 12, marginTop: 4 },
+  deleteBtn: { padding: 4, flexShrink: 0 },
+  deleteIcon: { fontSize: 16 },
 });

@@ -11,14 +11,12 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-// BARU: import dari _layout
 import { useTasks, useTheme } from "./_layout";
 
 export default function SettingsScreen() {
   const { tasks, clearAllTasks } = useTasks();
   const { isDark, toggleTheme, colors } = useTheme();
 
-  // BARU: konfirmasi sebelum hapus semua data
   const handleClearAllData = () => {
     if (tasks.length === 0) {
       Alert.alert("No Data", "There are no tasks to delete.");
@@ -40,18 +38,18 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={colors.background} />
+      
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Settings</Text>
         </View>
 
-        {/* Appearance */}
+        {/* Appearance Section */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Appearance</Text>
 
-          {/* DIUBAH: Theme toggle sekarang berfungsi */}
           <TouchableOpacity
             style={[
               styles.settingItem,
@@ -69,11 +67,10 @@ export default function SettingsScreen() {
               <View style={styles.settingContent}>
                 <Text style={[styles.settingLabel, { color: colors.text }]}>Theme</Text>
                 <Text style={[styles.settingDescription, { color: colors.textMuted }]}>
-                  {isDark ? "Dark" : "Light"} — tap to switch
+                  {isDark ? "Dark Mode" : "Light Mode"} — tap to switch
                 </Text>
               </View>
             </View>
-            {/* BARU: Switch yang menunjukkan status dark mode */}
             <Switch
               value={isDark}
               onValueChange={toggleTheme}
@@ -83,11 +80,10 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Data */}
+        {/* Data Section */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Data</Text>
 
-          {/* BARU: info jumlah tasks */}
           <View
             style={[
               styles.settingItem,
@@ -103,22 +99,21 @@ export default function SettingsScreen() {
               <View style={styles.settingContent}>
                 <Text style={[styles.settingLabel, { color: colors.text }]}>Total Tasks</Text>
                 <Text style={[styles.settingDescription, { color: colors.textMuted }]}>
-                  {tasks.length} task(s) stored
+                  {tasks.length} task(s) stored in device
                 </Text>
               </View>
             </View>
           </View>
         </View>
 
-        {/* Danger Zone */}
+        {/* Danger Zone Section */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Danger Zone</Text>
 
-          {/* DIUBAH: onPress sekarang terhubung ke handleClearAllData */}
           <TouchableOpacity
             style={[
               styles.settingItem,
-              { backgroundColor: colors.dangerBg, borderBottomColor: colors.dangerBorder },
+              { backgroundColor: isDark ? "#2a1515" : "#fff5f5", borderBottomColor: colors.dangerBorder },
             ]}
             activeOpacity={0.7}
             onPress={handleClearAllData}

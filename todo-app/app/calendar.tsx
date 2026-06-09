@@ -5,25 +5,22 @@ import {
   TouchableOpacity,
   StyleSheet,
   StatusBar,
-  FlatList,
   ScrollView,
   Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useTasks, useTheme } from "./_layout";
+import { useTasks, useTheme, Task } from "./_layout";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const HORIZONTAL_PADDING = 16;
-// Lebar grid = lebar layar dikurangi padding kiri+kanan
 const GRID_WIDTH = SCREEN_WIDTH - HORIZONTAL_PADDING * 2;
-// Lebar tiap sel = lebar grid dibagi 7, dikurangi margin (2px kiri+kanan)
 const CELL_SIZE = Math.floor(GRID_WIDTH / 7) - 4;
 
 export default function CalendarScreen() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const { tasks } = useTasks();
+  const { tasks, toggleTask } = useTasks();
   const { colors } = useTheme();
 
   const getDaysInMonth = (date: Date) =>
@@ -59,10 +56,14 @@ export default function CalendarScreen() {
     date.getFullYear() === selectedDate.getFullYear();
 
   const goToPreviousMonth = () =>
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1)
+    );
 
   const goToNextMonth = () =>
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1)
+    );
 
   const goToToday = () => {
     const today = new Date();
@@ -72,18 +73,13 @@ export default function CalendarScreen() {
 
   const generateCalendarRows = (): (Date | null)[][] => {
     const daysInMonth = getDaysInMonth(currentDate);
-    const firstDay = getFirstDayOfMonth(currentDate); // 0=Sun … 6=Sat
-
-    // Flat array: null untuk leading empty, lalu Date untuk tiap hari
+    const firstDay = getFirstDayOfMonth(currentDate);
     const flat: (Date | null)[] = [];
     for (let i = 0; i < firstDay; i++) flat.push(null);
     for (let d = 1; d <= daysInMonth; d++) {
       flat.push(new Date(currentDate.getFullYear(), currentDate.getMonth(), d));
     }
-    // Padding trailing agar total kelipatan 7
     while (flat.length % 7 !== 0) flat.push(null);
-
-    // Pecah menjadi rows of 7
     const rows: (Date | null)[][] = [];
     for (let i = 0; i < flat.length; i += 7) {
       rows.push(flat.slice(i, i + 7));
@@ -94,7 +90,6 @@ export default function CalendarScreen() {
   const calendarRows = generateCalendarRows();
   const tasksForSelectedDate = getTasksForDate(selectedDate);
 
-  // Render satu sel hari
   const renderDayCell = (day: Date | null, colIndex: number) => {
     if (!day) {
       return (
@@ -143,14 +138,22 @@ export default function CalendarScreen() {
         onPress={() => setSelectedDate(day)}
         activeOpacity={0.7}
       >
-        <Text style={[styles.dayText, { color: textColor, fontWeight: isTodayDate || isSelectedDate ? "700" : "500" }]}>
+        <Text
+          style={[
+            styles.dayText,
+            {
+              color: textColor,
+              fontWeight: isTodayDate || isSelectedDate ? "700" : "500",
+            },
+          ]}
+        >
           {day.getDate()}
         </Text>
         {hasTask && (
           <View
             style={[
               styles.taskDot,
-              { backgroundColor: isSelectedDate ? "#fff" : "#FF6B6B" },
+              { backgroundColor: isSelectedDate ? "#fff" : colors.danger },
             ]}
           />
         )}
@@ -158,23 +161,32 @@ export default function CalendarScreen() {
     );
   };
 
-  // Render satu baris kalender (7 sel)
-  const renderRow = (row: (Date | null)[], rowIndex: number) => (
-    <View key={`row-${rowIndex}`} style={styles.calendarRow}>
-      {row.map((day, colIndex) => renderDayCell(day, colIndex))}
-    </View>
-  );
-
-  const renderTask = ({ item }: { item: (typeof tasks)[0] }) => (
-    <View style={[styles.taskItem, { backgroundColor: colors.surface, borderLeftColor: colors.accent }]}>
-      <View style={[styles.checkbox, { borderColor: colors.accent }, item.completed && { backgroundColor: colors.accent }]}>
+  // FIX: Tidak pakai FlatList, langsung .map() dengan key prop yang benar
+  const renderTaskItem = (item: Task) => (
+    <View
+      style={[
+        styles.taskItem,
+        { backgroundColor: colors.surface, borderLeftColor: colors.accent },
+      ]}
+    >
+      <TouchableOpacity
+        onPress={() => toggleTask(item.id)}
+        style={[
+          styles.checkbox,
+          { borderColor: colors.accent },
+          item.completed && { backgroundColor: colors.accent },
+        ]}
+      >
         {item.completed && <Text style={styles.checkmark}>✓</Text>}
-      </View>
+      </TouchableOpacity>
       <Text
         style={[
           styles.taskTitle,
           { color: colors.text },
-          item.completed && { color: colors.textMuted, textDecorationLine: "line-through" },
+          item.completed && {
+            color: colors.textMuted,
+            textDecorationLine: "line-through",
+          },
         ]}
         numberOfLines={2}
       >
@@ -185,24 +197,43 @@ export default function CalendarScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
-      <ScrollView
-        style={[styles.container, { backgroundColor: colors.background }]}
-        showsVerticalScrollIndicator={false}
-      >
+      <StatusBar
+        barStyle={
+          colors.background === "#ffffff" ? "dark-content" : "light-content"
+        }
+      />
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>Calendar</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
+            Calendar
+          </Text>
         </View>
 
         {/* Month Navigation */}
-        <View style={[styles.monthNavigation, { backgroundColor: colors.surface }]}>
-          <TouchableOpacity onPress={goToPreviousMonth} style={styles.monthButton} activeOpacity={0.7}>
-            <MaterialCommunityIcons name="chevron-left" size={28} color={colors.accent} />
+        <View
+          style={[
+            styles.monthNavigation,
+            { backgroundColor: colors.surface },
+          ]}
+        >
+          <TouchableOpacity
+            onPress={goToPreviousMonth}
+            style={styles.monthButton}
+            activeOpacity={0.7}
+          >
+            <MaterialCommunityIcons
+              name="chevron-left"
+              size={28}
+              color={colors.accent}
+            />
           </TouchableOpacity>
           <View style={styles.monthCenter}>
             <Text style={[styles.monthText, { color: colors.text }]}>
-              {currentDate.toLocaleString("default", { month: "long", year: "numeric" })}
+              {currentDate.toLocaleString("default", {
+                month: "long",
+                year: "numeric",
+              })}
             </Text>
             <TouchableOpacity
               onPress={goToToday}
@@ -212,27 +243,46 @@ export default function CalendarScreen() {
               <Text style={styles.todayButtonText}>Today</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={goToNextMonth} style={styles.monthButton} activeOpacity={0.7}>
-            <MaterialCommunityIcons name="chevron-right" size={28} color={colors.accent} />
+          <TouchableOpacity
+            onPress={goToNextMonth}
+            style={styles.monthButton}
+            activeOpacity={0.7}
+          >
+            <MaterialCommunityIcons
+              name="chevron-right"
+              size={28}
+              color={colors.accent}
+            />
           </TouchableOpacity>
         </View>
 
-        {/* Weekday Headers — 7 kolom fixed */}
+        {/* Weekday Labels */}
         <View style={styles.weekdayRow}>
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
             <View key={day} style={[styles.weekdayCell, { width: CELL_SIZE + 4 }]}>
-              <Text style={[styles.weekdayText, { color: colors.textMuted }]}>{day}</Text>
+              <Text style={[styles.weekdayText, { color: colors.textMuted }]}>
+                {day}
+              </Text>
             </View>
           ))}
         </View>
 
-        {/* Calendar Grid — render per baris */}
+        {/* Calendar Grid */}
         <View style={[styles.calendarGrid, { backgroundColor: colors.surface }]}>
-          {calendarRows.map((row, rowIndex) => renderRow(row, rowIndex))}
+          {calendarRows.map((row, rowIndex) => (
+            <View key={`row-${rowIndex}`} style={styles.calendarRow}>
+              {row.map((day, colIndex) => renderDayCell(day, colIndex))}
+            </View>
+          ))}
         </View>
 
         {/* Selected Date Info */}
-        <View style={[styles.selectedDateSection, { borderBottomColor: colors.borderStrong }]}>
+        <View
+          style={[
+            styles.selectedDateSection,
+            { borderBottomColor: colors.borderStrong },
+          ]}
+        >
           <Text style={[styles.selectedDateTitle, { color: colors.text }]}>
             {selectedDate.toLocaleString("default", {
               weekday: "long",
@@ -241,23 +291,22 @@ export default function CalendarScreen() {
             })}
           </Text>
           <Text style={[styles.taskCountText, { color: colors.textMuted }]}>
-            {tasksForSelectedDate.length} {tasksForSelectedDate.length === 1 ? "Task" : "Tasks"}
+            {tasksForSelectedDate.length}{" "}
+            {tasksForSelectedDate.length === 1 ? "Task" : "Tasks"}
           </Text>
         </View>
 
-        {/* Tasks for Selected Date */}
+        {/* Task List untuk tanggal yang dipilih */}
         <View style={styles.tasksSection}>
           {tasksForSelectedDate.length === 0 ? (
             <Text style={[styles.noTasksText, { color: colors.textMuted }]}>
               No tasks for this date
             </Text>
           ) : (
-            <FlatList
-              scrollEnabled={false}
-              data={tasksForSelectedDate}
-              renderItem={renderTask}
-              keyExtractor={(item) => item.id}
-            />
+            // FIX: key prop ada di sini
+            tasksForSelectedDate.map((item) => (
+              <View key={item.id}>{renderTaskItem(item)}</View>
+            ))
           )}
         </View>
 
@@ -268,20 +317,10 @@ export default function CalendarScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { 
-    flex: 1, 
-  },
-  container: { 
-    flex: 1, 
-    paddingHorizontal: HORIZONTAL_PADDING, 
-  },
-  header: { 
-    paddingVertical: 20, 
-  },
-  headerTitle: { 
-    fontSize: 28, 
-    fontWeight: "bold", 
-  },
+  safe: { flex: 1 },
+  container: { flex: 1, paddingHorizontal: HORIZONTAL_PADDING },
+  header: { paddingVertical: 20 },
+  headerTitle: { fontSize: 28, fontWeight: "bold" },
   monthNavigation: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -291,47 +330,24 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 12,
   },
-  monthButton: { 
-    padding: 8, 
-  },
-  monthCenter: { 
-    alignItems: "center", 
-    flex: 1, 
-    gap: 8 
-  },
-  monthText: { 
-    fontSize: 18, 
-    fontWeight: "600", 
-  },
+  monthButton: { padding: 8 },
+  monthCenter: { alignItems: "center", flex: 1, gap: 8 },
+  monthText: { fontSize: 18, fontWeight: "600" },
   todayButton: {
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 8,
     elevation: 3,
   },
-  todayButtonText: { 
-    color: "#fff", 
-    fontWeight: "700", 
-    fontSize: 12, 
-  },
-
-  // Weekday header row
+  todayButtonText: { color: "#fff", fontWeight: "700", fontSize: 12 },
   weekdayRow: {
     flexDirection: "row",
     justifyContent: "space-around",
     marginBottom: 4,
     paddingHorizontal: 2,
   },
-  weekdayCell: { 
-    alignItems: "center", 
-    paddingVertical: 6 
-  },
-  weekdayText: { 
-    fontSize: 12, 
-    fontWeight: "600" 
-  },
-
-  // Grid
+  weekdayCell: { alignItems: "center", paddingVertical: 6 },
+  weekdayText: { fontSize: 12, fontWeight: "600" },
   calendarGrid: {
     borderRadius: 12,
     paddingVertical: 6,
@@ -339,7 +355,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   calendarRow: {
-    flexDirection: "row",         // ← 7 sel dalam 1 baris, tidak wrap
+    flexDirection: "row",
     justifyContent: "space-around",
     marginVertical: 2,
   },
@@ -357,24 +373,14 @@ const styles = StyleSheet.create({
     height: 5,
     borderRadius: 3,
   },
-
-  // Selected date section
   selectedDateSection: {
     marginBottom: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,
   },
-  selectedDateTitle: { 
-    fontSize: 18, 
-    fontWeight: "600", 
-    marginBottom: 4 
-  },
-  taskCountText: { 
-    fontSize: 14, 
-  },
-  tasksSection: { 
-    marginTop: 8, 
-  },
+  selectedDateTitle: { fontSize: 18, fontWeight: "600", marginBottom: 4 },
+  taskCountText: { fontSize: 14 },
+  tasksSection: { marginTop: 8 },
   taskItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -393,16 +399,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 12,
   },
-  checkmark: { 
-    color: "#fff", 
-    fontWeight: "bold", 
-    fontSize: 14 
-  },
-  taskTitle: { 
-    flex: 1, 
-    fontSize: 14, 
-    fontWeight: "500" 
-  },
+  checkmark: { color: "#fff", fontWeight: "bold", fontSize: 14 },
+  taskTitle: { flex: 1, fontSize: 14, fontWeight: "500" },
   noTasksText: {
     fontSize: 14,
     fontStyle: "italic",
