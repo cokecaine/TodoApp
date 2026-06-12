@@ -343,22 +343,20 @@ const styles = StyleSheet.create({
   },
   weekDaysRow: {
     flexDirection: "row",
-    justifyContent: "space-around",
     marginBottom: 12,
   },
   weekDayText: {
     fontSize: 13,
     fontWeight: "600",
-    width: 32,
+    width: `${100 / 7}%`,
     textAlign: "center",
   },
   daysGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-around",
   },
   dayCell: {
-    width: (SCREEN_WIDTH - HORIZONTAL_PADDING * 2 - 32) / 7,
+    width: `${100 / 7}%`,
     height: 46,
     justifyContent: "center",
     alignItems: "center",
