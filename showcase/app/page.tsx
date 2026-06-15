@@ -10,7 +10,7 @@ export default function Home() {
         <p className="subtitle">React Native Mobile Computing Assignment</p>
         
         <div className="button-group">
-          <a href="https://github.com/cokecaine/TodoApp/archive/refs/heads/main.zip" className="btn">
+          <a href="https://github.com/cokecaine/TodoApp/releases/download/v.1.0.0/todolist-app-production.apk" className="btn">
             <span className="material-symbols-rounded">download</span>
             Download App
           </a>
