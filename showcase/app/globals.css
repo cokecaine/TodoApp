@@ -210,6 +210,197 @@ a:hover {
   background-color: var(--accent-light);
 }
 
+/* Stats Row */
+.stats-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  flex: 1;
+  min-width: 120px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background-color: var(--accent-light);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-number {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.stat-sub {
+  font-size: 11px;
+  color: var(--link);
+  margin-top: 2px;
+}
+
+/* Goal List */
+.goal-list {
+  list-style: none;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.goal-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 15px;
+  color: var(--text-dim);
+}
+
+.goal-list .material-symbols-rounded {
+  color: #16a34a;
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Inline Code */
+.inline-code,
+code.inline-code {
+  font-family: 'Fira Mono', 'Courier New', monospace;
+  font-size: 13px;
+  background-color: var(--accent-light);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: var(--text);
+}
+
+/* Architecture Tree */
+.arch-tree {
+  margin-top: 20px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background-color: var(--accent-light);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.arch-branch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.arch-main .arch-label  { color: #7c3aed; }
+.arch-develop .arch-label { color: #2563eb; }
+
+.arch-features {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 28px;
+  border-left: 2px solid var(--border);
+  margin-left: 10px;
+}
+
+.arch-feature-branch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.arch-feature-branch .material-symbols-rounded {
+  font-size: 18px;
+  color: var(--text-dim);
+}
+
+.arch-label {
+  font-family: 'Fira Mono', 'Courier New', monospace;
+}
+
+/* Contributor Cards */
+.contrib-author {
+  margin-top: 24px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.contrib-author-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background-color: var(--accent-light);
+  border-bottom: 1px solid var(--border);
+}
+
+.contrib-avatar {
+  background-color: var(--border);
+  border-radius: 50%;
+  padding: 6px;
+  font-size: 20px;
+  color: var(--text-dim);
+}
+
+.contrib-author-header strong {
+  display: block;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.contrib-role {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* Commit List */
+.commit-list {
+  list-style: none;
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.commit-list li {
+  font-size: 13px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  line-height: 1.5;
+}
+
+.sha {
+  font-family: 'Fira Mono', 'Courier New', monospace;
+  font-size: 11px;
+  background-color: var(--accent-light);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: var(--link);
+  flex-shrink: 0;
+}
+
+/* Footer */
 .footer {
   border-top: 1px solid var(--border);
   padding-top: 32px;
